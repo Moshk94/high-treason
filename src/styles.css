@@ -4,7 +4,7 @@ body {
 }
 
 canvas {
-    background-color: #000;
+    background-color: #333333;
     margin: auto;
     position: absolute;
     top: 0;
