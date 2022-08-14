@@ -16,8 +16,5 @@
   "bugs": {
     "url": "https://github.com/Moshk94/Treason/issues"
   },
-  "homepage": "https://github.com/Moshk94/Treason#readme",
-  "devDependencies": {
-    "parcel": "^2.7.0"
-  }
+  "homepage": "https://github.com/Moshk94/Treason#readme"
 }
