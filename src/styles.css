@@ -1,7 +1,6 @@
-#canvasContainer {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+body {
+    background: repeating-conic-gradient(from 45deg,
+            #0c0c0c 0% 25%, #141414 0% 50%) 50%/60px 60px
 }
 
 canvas {
@@ -12,4 +11,10 @@ canvas {
     bottom: 0;
     left: 0;
     right: 0;
+}
+
+#canvasContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
