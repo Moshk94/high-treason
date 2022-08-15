@@ -1,0 +1,11 @@
+{
+  "name": "treason",
+  "scripts": {
+    "dev": "vite ./src",
+    "build": "vite build"
+  },
+  "devDependencies": {
+    "vite": "^3.0.7",
+    "gulp": "^4.0.2"
+  }
+}
