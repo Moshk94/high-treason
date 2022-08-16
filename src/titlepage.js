@@ -1,46 +1,31 @@
 import { ctx, title } from "./constants";
 
-let titleYpos = -50;
-let playXPos = -50
-let helpXPos = canvas.width + 50
-
-export function animateTitle() {
-    if (titleYpos < 250) {
-        titleYpos += 20;
-    };
-    const textWidth = 164
+export function drawTitleText() {
 
     ctx.beginPath();
     ctx.font = '75px serif';
     ctx.fillStyle = "black";
-    ctx.fillText(title, canvas.width / 2 - textWidth, titleYpos + 10);
+    ctx.fillText(title, canvas.width / 2 - ctx.measureText(title).width / 2, 250 + 10);
     ctx.closePath();
 
     ctx.beginPath();
     ctx.fillStyle = "goldenrod";
-    ctx.fillText(title, canvas.width / 2 - textWidth, titleYpos);
+    ctx.fillText(title, canvas.width / 2 - ctx.measureText(title).width / 2, 250);
     ctx.closePath();
 };
 
 export function animatePlayButton() {
-    if (playXPos < (canvas.width / 2 - 80)) {
-        playXPos += 15;
-    };
     ctx.beginPath();
     ctx.font = '75px serif';
     ctx.fillStyle = "black";
-    ctx.fillText('PLAY', playXPos, 450);
+    ctx.fillText('PLAY', canvas.width / 2 - ctx.measureText('PLAY').width / 2, 450);
     ctx.closePath();
 }
 
 export function animateH2PButton() {
-    if (helpXPos > (canvas.width / 2 - 50)) {
-        helpXPos -= 20;
-    };
-
     ctx.beginPath();
     ctx.font = '50px serif';
     ctx.fillStyle = "black";
-    ctx.fillText("HELP", helpXPos, 550);
+    ctx.fillText("HELP", canvas.width / 2 - ctx.measureText('HELP').width / 2, 550);
     ctx.closePath();
 }
