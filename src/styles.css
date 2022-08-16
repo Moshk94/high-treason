@@ -1,20 +1,36 @@
 body {
-    background: repeating-conic-gradient(from 45deg,
-            #3e1818 0% 25%, #141414 0% 50%) 50%/60px 60px
+    background-color: black;
 }
 
 canvas {
-    background-color: #333333;
+    background: repeating-conic-gradient(from 45deg,
+            #333333 0% 25%, #141414 0% 50%) 50%/60px 60px;
     margin: auto;
     position: absolute;
     top: 0;
     bottom: 0;
     left: 0;
     right: 0;
+    animation-name: moveCheckeredBackground;
+    animation-duration: 60s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
 }
 
 #canvasContainer {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+@keyframes moveCheckeredBackground {
+    from {
+        background-position-x: 0%;
+        background-position-y: 0%;
+    }
+
+    to {
+        background-position-x: 100%;
+        background-position-y: 100%;
+    }
 }
