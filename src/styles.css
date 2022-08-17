@@ -3,8 +3,8 @@ body {
 }
 
 canvas {
-    background: repeating-conic-gradient(from 45deg,
-            #333333 0% 25%, #141414 0% 50%) 50%/60px 60px;
+    background: repeating-conic-gradient(from 90deg,
+            #333333 0% 25%, #141414 0% 50%) 50%/100px 100px;
     margin: auto;
     position: absolute;
     top: 0;
@@ -12,7 +12,7 @@ canvas {
     left: 0;
     right: 0;
     animation-name: moveCheckeredBackground;
-    animation-duration: 60s;
+    animation-duration: 95s;
     animation-timing-function: linear;
     animation-iteration-count: infinite;
 }
@@ -30,7 +30,7 @@ canvas {
     }
 
     to {
-        background-position-x: 100%;
+        background-position-x: -100%;
         background-position-y: 100%;
     }
 }
