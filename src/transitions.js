@@ -1,24 +1,23 @@
-import { ctx } from "./constants";
+import { ctx } from "./core";
 
 export let gamePhase = 0;
-const transitionSpeed = 0.1;
+const transitionSpeed = 0.06;
 let isTransioning = 0;
 let alpha = 0;
 let transitionTo;
 
-export function screenFade(){
+export function screenFade() {
     if (isTransioning) {
-        if (alpha <= 1) {
-
+        if (alpha <= 2) {
             alpha += transitionSpeed;
-        } else if (alpha > 1) {
-            gamePhase = transitionTo
-            isTransioning = 0
+        } else if (alpha > 2) {
+            gamePhase = transitionTo;
+            isTransioning = 0;
         }
 
     } if (!isTransioning) {
         if (alpha >= 0) {
-            alpha -= transitionSpeed + 0.2;
+            alpha -= (0.06);
             transitionTo = undefined;
         }
     };
@@ -30,7 +29,7 @@ export function screenFade(){
     ctx.closePath();
 };
 
-export function changeTransitionTo(x){
+export function changeTransitionTo(x) {
     transitionTo = x;
     isTransioning = 1;
 }

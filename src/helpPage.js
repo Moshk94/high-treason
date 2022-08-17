@@ -1,4 +1,4 @@
-import { ctx } from "./constants";
+import { ctx } from "./core";
 
 function drawTitle(x){
     ctx.beginPath();
