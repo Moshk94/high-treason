@@ -1,6 +1,6 @@
 import { drawTitlePage, handleTitleMouseEvents } from './titlepage.js'
 import { gamePhase, screenFade } from './transitions.js'
-import { drawHelpPlayer, drawHelpKing } from './helpPage.js'
+import { drawHelpPlayer, drawHelpEnemy } from './helpPage.js'
 
 export const ctx = document.getElementById('canvas').getContext("2d");
 
@@ -38,19 +38,19 @@ setInterval(() => {
             break;
         }
         case 2.2: { // Help Page 2
-            drawHelpKing();
+            drawHelpEnemy();
             break;
         }
     }
 
     screenFade();
 
-    ctx.save();
-    ctx.fillStyle = 'red';
-    ctx.fillRect(canvas.width / 2 - 2.5, 0, 5, canvas.height)
-    ctx.restore();
-    ctx.save();
-    ctx.fillStyle = 'red';
-    ctx.fillRect(0, canvas.height/2-2.5, canvas.width, 5)
-    ctx.restore();
+    // ctx.save();
+    // ctx.fillStyle = 'red';
+    // ctx.fillRect(canvas.width / 2 - 2.5, 0, 5, canvas.height)
+    // ctx.restore();
+    // ctx.save();
+    // ctx.fillStyle = 'red';
+    // ctx.fillRect(0, canvas.height/2-2.5, canvas.width, 5)
+    // ctx.restore();
 }, 1 / 60);

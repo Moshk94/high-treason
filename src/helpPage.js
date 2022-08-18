@@ -1,89 +1,35 @@
-import { ctx } from "./core";
-
-function drawTitle(x){
-    ctx.beginPath();
-    ctx.font = '50px serif';
-    ctx.fillStyle = "black";
-    ctx.fillText(x, canvas.width / 2 - ctx.measureText(x).width/2, 200);
-    ctx.closePath();
-};
-
+import { drawText } from "./helperFunctions";
 
 export function drawHelpPlayer(){
-    drawTitle("PAWNS")
+    drawText("PAWNS", canvas.width / 2, 170, 100, 'black');
+    drawText("PAWNS", canvas.width / 2, 165, 100, 'RED');
+    
+    drawText("MOVE ON THE STRAIGHTS - ACTION ON THE DIAGONALS", canvas.width / 2, 225, 20, 'yellow');
 
-    ctx.beginPath();
-    ctx.font = '20px serif';
-    ctx.fillStyle = "black";
-    let txt = "MOVE ON THE STRAIGHTS - ACTIONS ON THE DIAGONALS"
-    ctx.fillText(txt, canvas.width/2 - ctx.measureText(txt).width/2, 250);
-    ctx.closePath();
+    drawText("NO ABILITIES - HAS INCREASED ATTACK", canvas.width / 2, 300, 20, 'white');
+    
+    drawText("CAN HEAL OTHER PIECES IN RANGE AND", canvas.width / 2, 350, 20, 'white');
+    drawText("REMOVE CURSE FROM PIECES", canvas.width / 2, 365, 20, 'white');
+    drawText("(HEALING IS DISTRIBUTED EVENLY)", canvas.width / 2, 380, 20, 'white');
 
-    ctx.beginPath();
-    ctx.font = '15px serif';
-    ctx.fillStyle = 'white';
-    txt = "NO ABILITIES - HAS INCREASED ATTACK"
-    ctx.fillText(txt, canvas.width/2 - ctx.measureText(txt).width/2, 350);
-    ctx.closePath();
+    drawText("CAN INCREASE PIECE ATTACK", canvas.width / 2, 430, 20, 'white');
+};
 
-    ctx.beginPath();
-    ctx.font = '10px serif';
-    ctx.fillStyle = 'green';
-    txt = "CAN HEAL OTHER PIECES IN RANGE AND REMOVE CURSE FROM PIECES (HEALING IS DISTRIBUTED EVENLY)"
-    ctx.fillText(txt, canvas.width/2 - ctx.measureText(txt).width/2, 400);
-    ctx.closePath();
+export function drawHelpEnemy(){
+    let txt;
+    drawText("QUEEN", canvas.width / 2, 170, 100, 'black');
+    drawText("QUEEN", canvas.width / 2, 165, 100, 'RED');
 
-    ctx.beginPath();
-    ctx.font = '15px serif';
-    ctx.fillStyle = 'red';
-    txt = "CAN INCREASE PIECE ATTACK"
-    ctx.fillText(txt, canvas.width/2 - ctx.measureText(txt).width/2, 450);
-    ctx.closePath();
-}
+    drawText("KILL THE EVIL QUEEN PIECE", canvas.width / 2, 225, 25, 'yellow');
 
-export function drawHelpKing(){
-    drawTitle("KING")
+    drawText("THE QUEEN HAS AN ATTACK RANGE OF 2 SQUARES", canvas.width / 2, 250, 20, 'white');
 
-    ctx.beginPath();
-    ctx.font = '25px serif';
-    ctx.fillStyle = "black";
-    let txt = "KILL THE EVIL KING PIECE"
-    ctx.fillText(txt, canvas.width/2 - ctx.measureText(txt).width/2, 250);
-    ctx.closePath();
+    drawText("SPECIAL ATTACKS (UNLIMITED RANGED)", canvas.width / 2, 300, 20, 'white');
+    
+    drawText("BUFFS ATTACK", canvas.width / 2, 350, 22, 'white');
 
-    ctx.beginPath();
-    ctx.font = '25px serif';
-    ctx.fillStyle = "black";
-    txt = "THE KING HAS AN ATTACK RANGE OF 2 SQUARES"
-    ctx.fillText(txt, canvas.width/2 - ctx.measureText(txt).width/2, 280);
-    ctx.closePath();
+    drawText("APPLIES DAMAGE OVER TIME TO PIECES", canvas.width / 2, 375, 22, 'white');
+    drawText("INCREASES DAMAGE OVER TIME IF ALREADY CURSED", canvas.width / 2, 390, 22, 'white');
 
-    ctx.beginPath();
-    ctx.font = '25px serif';
-    ctx.fillStyle = "black";
-    txt = "KINGS SPECIAL ATTACK (UNLIMITED RANGED): "
-    ctx.fillText(txt, canvas.width/2 - ctx.measureText(txt).width/2, 310);
-    ctx.closePath();
-
-    ctx.beginPath();
-    ctx.font = '25px serif';
-    ctx.fillStyle = "black";
-    txt = "ATTACK BUFF - BUFFS ATTACK"
-    ctx.fillText(txt, canvas.width/2 - ctx.measureText(txt).width/2, 340);
-    ctx.closePath();
-
-
-    ctx.beginPath();
-    ctx.font = '10px serif';
-    ctx.fillStyle = "black";
-    txt = "CURSE - APPLIES DAMAGE OVER TIME TO PIECES. INCREASES DAMAGE OVER TIME IF ALREADY CURSED"
-    ctx.fillText(txt, canvas.width/2 - ctx.measureText(txt).width/2, 360);
-    ctx.closePath();
-
-    ctx.beginPath();
-    ctx.font = '10px serif';
-    ctx.fillStyle = "black";
-    txt = "HEAL - RESTORES 35% HEALTH"
-    ctx.fillText(txt, canvas.width/2 - ctx.measureText(txt).width/2, 390);
-    ctx.closePath();
-}
+    drawText("RESTORES SOME HEALTH", canvas.width / 2, 440, 22, 'white');
+};

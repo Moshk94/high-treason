@@ -12,7 +12,7 @@ export function drawTitlePage(x, y) {
     ctx.save();
     ctx.fillStyle = 'blue';
     ctx.fillRect(canvas.width / 2 - 49, 478, 92, 35)
-    ctx.restore()
+    ctx.restore();
 
     drawText(TITLE, canvas.width / 2, 310, 120, 'black');
     drawText(TITLE, canvas.width / 2, 300, 120);
@@ -44,5 +44,4 @@ export function handleTitleMouseEvents(x, y, e) {
     } else {
         drawText("HELP", canvas.width / 2, 490, 50);
     }
-
 }

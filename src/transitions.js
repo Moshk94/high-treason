@@ -1,6 +1,7 @@
 import { ctx } from "./core";
 
-export let gamePhase = 0;
+// export let gamePhase = 0;
+export let gamePhase = 2.2;
 const transitionSpeed = 0.06;
 let isTransioning = 0;
 let alpha = 0;
