@@ -1,8 +1,11 @@
 import { drawText } from "./helperFunctions";
+import { ctx } from "./core";
 
 export function drawHelpPlayer(){
+
+    drawBackground();
     drawText("PAWNS", canvas.width / 2, 170, 100, 'black');
-    drawText("PAWNS", canvas.width / 2, 165, 100, 'RED');
+    drawText("PAWNS", canvas.width / 2, 165, 100);
     
     drawText("MOVE ON THE STRAIGHTS - ACTION ON THE DIAGONALS", canvas.width / 2, 225, 20, 'yellow');
 
@@ -16,8 +19,9 @@ export function drawHelpPlayer(){
 };
 
 export function drawHelpEnemy(){
+    drawBackground();
     drawText("QUEEN", canvas.width / 2, 170, 100, 'black');
-    drawText("QUEEN", canvas.width / 2, 165, 100, 'RED');
+    drawText("QUEEN", canvas.width / 2, 165, 100);
 
     drawText("KILL THE EVIL QUEEN PIECE", canvas.width / 2, 225, 25, 'yellow');
 
@@ -32,3 +36,10 @@ export function drawHelpEnemy(){
 
     drawText("RESTORES SOME HEALTH", canvas.width / 2, 440, 22, 'white');
 };
+
+function drawBackground(){
+    ctx.beginPath();
+    ctx.fillStyle = '#265b5f';
+    ctx.fillRect(0, 130, canvas.width, 410);
+    ctx.closePath();
+}

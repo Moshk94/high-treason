@@ -1,13 +1,22 @@
-import { drawTitlePage, handleTitleMouseEvents } from './titlepage.js'
+import { drawTitlePage } from './titlepage.js'
 import { gamePhase, screenFade } from './transitions.js'
 import { drawHelpPlayer, drawHelpEnemy } from './helpPage.js'
 import { pauseScreen } from './playsScreen.js';
 import { changeTransitionTo } from "./transitions";
+import { DrawTextWithLink } from './classes.js';
 
 export const ctx = document.getElementById('canvas').getContext("2d");
 
-let mouseX;
-let mouseY;
+export let mouseX;
+export let mouseY;
+
+export let textWithLink = [
+    new DrawTextWithLink("RESUME", canvas.width / 2, 350, 50, "yellow", [-1], 3, 1),
+    new DrawTextWithLink("QUIT", canvas.width / 2, 410, 50, "yellow", [-1], 0, 1),
+    new DrawTextWithLink("PLAY", canvas.width / 2, 420, 75, "#333", [0], 3, 1),
+    new DrawTextWithLink("HELP", canvas.width / 2, 495, 50, "#333", [0], 2.1, 1),
+    new DrawTextWithLink("PLAY", canvas.width / 2, 495, 50, "#333", [2.1,2.2], 3, 1),
+]
 
 canvas.addEventListener('mousemove', function (e) {
     let rect = canvas.getBoundingClientRect();
@@ -16,41 +25,39 @@ canvas.addEventListener('mousemove', function (e) {
 }, false);
 
 canvas.addEventListener('mouseup', function (e) {
-    if (gamePhase == 0) {
-        handleTitleMouseEvents(mouseX, mouseY, e)
-    } if( gamePhase == -1){
+    if (gamePhase == -1) {
         pauseScreen(mouseX, mouseY, e)
     }
+
+    textWithLink.forEach(e => {
+        e.click();
+    });
 }, false);
 
 canvas.addEventListener('keydown', function (e) {
     if (gamePhase == 3 && e.keyCode == 27) {
         changeTransitionTo(-1);
-    } else if (gamePhase == -1 && e.keyCode == 27 ) {
+    } else if (gamePhase == -1 && e.keyCode == 27) {
         changeTransitionTo(3);
     }
 })
 
 setInterval(() => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if(gamePhase == 0){// Title Screen
-        ctx.beginPath();
-        ctx.fillStyle = '#265b5f';
-        ctx.fillRect(0, 250, canvas.width, 310);
-        ctx.closePath();
-
-        drawTitlePage(mouseX, mouseY);
-    } else if (gamePhase == 2.1){ // Help Page 1
+    if (gamePhase == 0) {// Title Screen
+        drawTitlePage();
+    } else if (gamePhase == 2.1) { // Help Page 1
         drawHelpPlayer();
-    } else if (gamePhase == 2.2){ // Help Page 2
+    } else if (gamePhase == 2.2) { // Help Page 2
         drawHelpEnemy();
-    } else if(gamePhase == 3 || gamePhase == -1){
+    } else if (gamePhase == 3 || gamePhase == -1) {
     };
 
+    for (let i = 2; i < textWithLink.length; i++) {
+       textWithLink[i].draw();
+    }
     screenFade();
-    if(gamePhase == -1){
-        pauseScreen(mouseX,mouseY)
-    };
+
     // ctx.save();
     // ctx.fillStyle = 'red';
     // ctx.fillRect(canvas.width / 2 - 2.5, 0, 5, canvas.height)
