@@ -1,6 +1,8 @@
 import { drawTitlePage, handleTitleMouseEvents } from './titlepage.js'
 import { gamePhase, screenFade } from './transitions.js'
 import { drawHelpPlayer, drawHelpEnemy } from './helpPage.js'
+import { pauseScreen } from './playsScreen.js';
+import { changeTransitionTo } from "./transitions";
 
 export const ctx = document.getElementById('canvas').getContext("2d");
 
@@ -15,36 +17,40 @@ canvas.addEventListener('mousemove', function (e) {
 
 canvas.addEventListener('mouseup', function (e) {
     if (gamePhase == 0) {
-        handleTitleMouseEvents(mouseX,mouseY,e)
+        handleTitleMouseEvents(mouseX, mouseY, e)
+    } if( gamePhase == -1){
+        pauseScreen(mouseX, mouseY, e)
     }
 }, false);
 
+canvas.addEventListener('keydown', function (e) {
+    if (gamePhase == 3 && e.keyCode == 27) {
+        changeTransitionTo(-1);
+    } else if (gamePhase == -1 && e.keyCode == 27 ) {
+        changeTransitionTo(3);
+    }
+})
+
 setInterval(() => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    switch (gamePhase) {
-        case 0: { // Title Screen
+    if(gamePhase == 0){// Title Screen
+        ctx.beginPath();
+        ctx.fillStyle = '#265b5f';
+        ctx.fillRect(0, 250, canvas.width, 310);
+        ctx.closePath();
 
-            ctx.beginPath();
-            ctx.fillStyle = '#265b5f';
-            ctx.fillRect(0, 250, canvas.width, 310);
-            ctx.closePath();
-
-            
-            drawTitlePage(mouseX, mouseY);
-            break;
-        };
-        case 2.1: { // Help Page 1
-            drawHelpPlayer();
-            break;
-        }
-        case 2.2: { // Help Page 2
-            drawHelpEnemy();
-            break;
-        }
-    }
+        drawTitlePage(mouseX, mouseY);
+    } else if (gamePhase == 2.1){ // Help Page 1
+        drawHelpPlayer();
+    } else if (gamePhase == 2.2){ // Help Page 2
+        drawHelpEnemy();
+    } else if(gamePhase == 3 || gamePhase == -1){
+    };
 
     screenFade();
-
+    if(gamePhase == -1){
+        pauseScreen(mouseX,mouseY)
+    };
     // ctx.save();
     // ctx.fillStyle = 'red';
     // ctx.fillRect(canvas.width / 2 - 2.5, 0, 5, canvas.height)
