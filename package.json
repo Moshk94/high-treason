@@ -2,6 +2,7 @@
   "name": "treason",
   "scripts": {
     "dev": "vite ./src",
+    "test": "vite ./test",
     "build": "vite build"
   },
   "devDependencies": {
