@@ -16,6 +16,8 @@ export let textWithLink = [
     new DrawTextWithLink("PLAY", canvas.width / 2, 420, 75, "#333", [0], 3, 1),
     new DrawTextWithLink("HELP", canvas.width / 2, 495, 50, "#333", [0], 2.1, 1),
     new DrawTextWithLink("PLAY", canvas.width / 2, 495, 50, "#333", [2.1,2.2], 3, 1),
+    new DrawTextWithLink("<|", canvas.width / 2 + 80, 496, 50, "#333", [2.1], 2.2, 1),
+    new DrawTextWithLink("|>", canvas.width / 2 - 80, 496, 50, "#333", [2.2], 2.1, 1),
 ]
 
 canvas.addEventListener('mousemove', function (e) {

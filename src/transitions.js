@@ -1,6 +1,6 @@
 import { ctx } from "./core";
 import { pauseScreen } from "./playsScreen";
-export let gamePhase = 2.2;
+export let gamePhase = 0;
 const transitionSpeed = 0.06;
 let isTransioning = 0;
 let alpha = 0;
