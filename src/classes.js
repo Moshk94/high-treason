@@ -55,8 +55,6 @@ export class DrawTextWithLink {
         if (mouseX > this.left && mouseX < this.right + this.left &&
             mouseY > this.top && mouseY < this.bottom + this.top) {
             return true
-        } else {
-            return false
         }
     }
 }
