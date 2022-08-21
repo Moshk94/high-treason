@@ -4,6 +4,7 @@ import { drawHelpPlayer, drawHelpEnemy } from './helpPage.js'
 import { pauseScreen } from './playsScreen.js';
 import { changeTransitionTo } from "./transitions";
 import { DrawTextWithLink } from './classes.js';
+import { drawBoard } from './boardUI.js';
 
 export const ctx = document.getElementById('canvas').getContext("2d");
 
@@ -53,6 +54,7 @@ setInterval(() => {
     } else if (gamePhase == 2.2) { // Help Page 2
         drawHelpEnemy();
     } else if (gamePhase == 3 || gamePhase == -1) {
+        drawBoard();
     };
 
     for (let i = 2; i < textWithLink.length; i++) {

@@ -2,8 +2,8 @@ import { ctx } from "./test";
 const showGrid = true;
 
 export function drawDebuggerGrid() {
-    let vDivisor = 50;
-    let hDivisor = 50;
+    let vDivisor = 25;
+    let hDivisor = 25;
     let gridColor = 'rgba(255, 0, 0,0.1)'
     let verticalGrids = canvas.width / vDivisor;
     let horizontalGrids = canvas.height / hDivisor;
