@@ -7,8 +7,10 @@ const boardX = 125;
 const boardY = 200;
 const cellSize = 50;
 const pawnImg = new Image();
+const queenImg = new Image();
 const PI = Math.PI;
 
+queenImg.src = 'q.png'
 pawnImg.src = 'p.png';
 
 let mouseX;
@@ -133,9 +135,9 @@ class Pawn extends Piece {
 
 let ghostArray = [];
 export let pawnArray = [
-    new Pawn(7, 90),
-    new Pawn(43, -60),
-    new Pawn(49, 200),
+    new Pawn(22, 90),
+    new Pawn(28, -60),
+    new Pawn(46, 200),
 ];
 
 canvas.addEventListener('mousemove', function (e) {
@@ -174,6 +176,7 @@ setInterval(() => {
     drawBoard();
     allPiece = [...ghostArray, ...pawnArray].sort(function (a, b) { return a.position - b.position });
     allPiece.forEach(e => { e.draw(); });
+    ctx.drawImage(queenImg, boardX+50+50, boardY);    
 }, 1 / 60);
 
 function drawBoard() {
