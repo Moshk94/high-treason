@@ -33,6 +33,78 @@ class Piece {
     };
 };
 
+class Queen extends Piece {
+    constructor(position) {
+        super();
+        this.position = position;
+        this.attack = 30;
+        this.currentHP = 100;
+        this.maxHP = 100;
+    };
+    draw() {
+        this.drawQueenInformationSection();
+        this.x = 130 + (this.getBoardCoords(this.position).x * 50);
+        this.y = 180 + (50 * 0.8 * this.getBoardCoords(this.position).y);
+        ctx.save();
+        ctx.filter = 'sepia(100%) saturate(500%) hue-rotate(2deg)';
+        ctx.drawImage(queenImg, this.x - 5, this.y - 20);
+        ctx.restore();
+
+    };
+    isWithinBounds() { };
+    getBoardCoords(c) {
+        return {
+            x: (c - 1) % 7,
+            y: Math.ceil(c / 7) - 1,
+        };
+    };
+    drawQueenInformationSection(){
+        ctx.fillStyle = "black";
+        ctx.fillRect(boardX, boardY - cellSize * 2, 350, 50);
+
+        ctx.fillStyle = "grey"
+        ctx.fillRect(boardX, boardY - cellSize * 2, 350, 20);
+
+        ctx.fillStyle = "green"
+        ctx.fillRect(boardX, boardY - cellSize * 2, 350 * (this.currentHP/this.maxHP), 20);
+
+        drawText(
+            `${this.currentHP} / ${this.maxHP}`,
+            boardX + 175,
+            boardY - cellSize * 2 + 9,
+            25,
+            'white'
+        );
+
+        drawText(
+            `Att: ${this.attack}`,
+            boardX + 175,
+            boardY - cellSize * 2 + 35,
+            25,
+            'darkred'
+        );
+
+        ctx.beginPath();
+        ctx.strokeStyle = 'darkred';
+        ctx.lineWidth = 5;
+        ctx.arc(
+            boardX,
+            boardY - cellSize * 2 + 25,
+            30,
+            0,
+            2 * PI
+        );
+        ctx.stroke();
+        ctx.fillStyle = "black"
+        ctx.fill();
+
+        ctx.save();
+        ctx.filter = 'sepia(100%) saturate(500%) hue-rotate(2deg)';
+        ctx.drawImage(queenImg, boardX - 25, boardY - 130);
+        ctx.restore();
+    }
+};
+
 class Moves extends Piece {
     constructor(position, owner) {
         super();
@@ -63,15 +135,15 @@ class Moves extends Piece {
 };
 
 class Pawn extends Piece {
-    constructor(position, type) {
+    constructor(position, type,attack) {
         super();
         this.type = type;
         this.position = position;
         this.x = 130 + (this.getBoardCoords(position).x * 50);
         this.y = 180 + (50 * 0.8 * this.getBoardCoords(position).y);
-        this.currentHP = Math.floor(Math.random() * 100) + 1;
+        this.currentHP = 100;
         this.maxHP = 100;
-        this.attack = Math.floor(Math.random() * 50) + 1;
+        this.attack = attack;
     };
     draw(x = this.x, y = this.y, dx = 40, dy = 60) {
         if (moveTo != undefined && moveTo.owner == this.type) {
@@ -134,11 +206,12 @@ class Pawn extends Piece {
 };
 
 let ghostArray = [];
-export let pawnArray = [
-    new Pawn(22, 90),
-    new Pawn(28, -60),
-    new Pawn(46, 200),
+let pawnArray = [
+    new Pawn(44, 50, 10),
+    new Pawn(48, -60, 10),
+    new Pawn(39, 0, 20),
 ];
+let queenArray = [new Queen(4)]
 
 canvas.addEventListener('mousemove', function (e) {
     let r = canvas.getBoundingClientRect();
@@ -174,9 +247,8 @@ setInterval(() => {
     drawDebuggerGrid();
     drawInformationSection();
     drawBoard();
-    allPiece = [...ghostArray, ...pawnArray].sort(function (a, b) { return a.position - b.position });
+    allPiece = [...ghostArray, ...pawnArray, ...queenArray].sort(function (a, b) { return a.position - b.position });
     allPiece.forEach(e => { e.draw(); });
-    ctx.drawImage(queenImg, boardX+50+50, boardY);    
 }, 1 / 60);
 
 function drawBoard() {
@@ -225,7 +297,7 @@ function drawInformationSection() {
             infoX + 75,
             boardY + cellSize * 7 + 10,
             25,
-            'white'
+            'darkred'
         );
 
         ctx.beginPath();
