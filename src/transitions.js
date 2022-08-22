@@ -1,6 +1,7 @@
 import { ctx } from "./core";
 import { pauseScreen } from "./playsScreen";
-export let gamePhase = 3;
+import { resetGame } from "./core";
+export let gamePhase = 0;
 const transitionSpeed = 0.06;
 let isTransioning = 0;
 let alpha = 0;
@@ -51,6 +52,12 @@ export function screenFade() {
 
         fade(alpha);
     }
+
+    if(gamePhase == 0 || gamePhase == 2.1 || gamePhase == 2.2){
+        if(transitionTo == 3){
+            resetGame();
+        };
+    };
 };
 
 export function changeTransitionTo(x) {

@@ -28,33 +28,32 @@ export class DrawTextWithLink {
                 ctx.fillStyle = this.color;
             }
 
-            if(this.shadow){
+            if (this.shadow) {
                 ctx.save();
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillStyle = "black";
-                ctx.fillText(this.txt, this.x, this.y + this.fontsize/10);
+                ctx.fillText(this.txt, this.x, this.y + this.fontsize / 10);
                 ctx.restore();
             };
-            
+
             ctx.save();
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(this.txt, this.x, this.y);
             ctx.restore();
-
-
-        }
-    }
+        };
+    };
     click() {
         if (this.isWithinBounds() && this.page.indexOf(gamePhase) !== -1) {
             changeTransitionTo(this.pageTo)
         }
+
     }
     isWithinBounds() {
         if (mouseX > this.left && mouseX < this.right + this.left &&
             mouseY > this.top && mouseY < this.bottom + this.top) {
             return true
         }
-    }
-}
+    };
+};
