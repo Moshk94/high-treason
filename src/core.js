@@ -16,7 +16,7 @@ export let textWithLink = [
     new DrawTextWithLink("QUIT", canvas.width / 2, 410, 50, "yellow", [-1], 0, 1),
     new DrawTextWithLink("PLAY", canvas.width / 2, 420, 75, "#333", [0], 3, 1),
     new DrawTextWithLink("HELP", canvas.width / 2, 495, 50, "#333", [0], 2.1, 1),
-    new DrawTextWithLink("PLAY", canvas.width / 2, 495, 50, "#333", [2.1,2.2], 3, 1),
+    new DrawTextWithLink("PLAY", canvas.width / 2, 495, 50, "#333", [2.1, 2.2], 3, 1),
     new DrawTextWithLink("<|", canvas.width / 2 + 80, 496, 50, "#333", [2.1], 2.2, 1),
     new DrawTextWithLink("|>", canvas.width / 2 - 80, 496, 50, "#333", [2.2], 2.1, 1),
 ];
@@ -148,7 +148,11 @@ class Pawn extends Piece {
 };
 
 export let ghostArray = [];
-export let pawnArray;
+export let pawnArray = [
+    new Pawn(39, 90),
+    new Pawn(45, -60),
+    new Pawn(47, 200),
+];
 
 canvas.addEventListener('mousemove', function (e) {
     let rect = canvas.getBoundingClientRect();
@@ -161,30 +165,34 @@ canvas.addEventListener('mouseup', function (e) {
         pauseScreen(mouseX, mouseY, e)
     }
 
+
     textWithLink.forEach(e => {
         e.click();
     });
 
-    ghostArray.forEach(e => {
-        if (e.isWithinBounds()) {
-            e.click();
-        }
-    });
+    if (gamePhase == 3) {
+        ghostArray.forEach(e => {
+            if (e.isWithinBounds()) {
+                e.click();
+            }
+        });
 
-    ghostArray = [];
+        ghostArray = [];
 
-    pawnArray.forEach(e => {
-        e.selected = 0;
-        e.click();
-        if (!e.isWithinBounds()) {
+        pawnArray.forEach(e => {
             e.selected = 0;
-        };
+            e.click();
+            if (!e.isWithinBounds()) {
+                e.selected = 0;
+            };
 
-        if (e.selected) {
-            ghostArray = [];
-            e.findLegalMoves();
-        };
-    })
+            if (e.selected) {
+                ghostArray = [];
+                e.findLegalMoves();
+            };
+        })
+
+    }
 }, false);
 
 canvas.addEventListener('keydown', function (e) {
@@ -205,13 +213,13 @@ setInterval(() => {
         drawHelpEnemy();
     } else if (gamePhase == 3 || gamePhase == -1) {
         drawBoard();
-        drawInformationSection();        
+        drawInformationSection();
         allPiece = [...ghostArray, ...pawnArray].sort(function (a, b) { return a.position - b.position });
         allPiece.forEach(e => { e.draw(); });
     };
 
     for (let i = 2; i < textWithLink.length; i++) {
-       textWithLink[i].draw();
+        textWithLink[i].draw();
     }
     screenFade();
 }, 1 / 60);
@@ -272,12 +280,12 @@ function drawInformationSection() {
     };
 };
 
-export function resetGame(){
-    console.log("reseting")
-    pawnArray = [
-        new Pawn(39, 90),
-        new Pawn(45, -60),
-        new Pawn(47, 200),
-    ];
-    ghostArray = [];
+export function resetGame() {
+    // console.log("reseting")
+    // pawnArray = [
+    //     new Pawn(39, 90),
+    //     new Pawn(45, -60),
+    //     new Pawn(47, 200),
+    // ];
+    // ghostArray = [];
 }

@@ -29,15 +29,3 @@ export function drawText(text, centerX, centerY, fontsize, color = '#333') {
     ctx.fillText(text, centerX, centerY);
     ctx.restore();
 };
-
-
-
-
-ctx.save();
-ctx.fillStyle = 'red';
-ctx.fillRect(canvas.width / 2 - 2.5, 0, 5, canvas.height)
-ctx.restore();
-ctx.save();
-ctx.fillStyle = 'red';
-ctx.fillRect(0, canvas.height/2-2.5, canvas.width, 5)
-ctx.restore();

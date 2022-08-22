@@ -9,7 +9,7 @@ const cellSize = 50;
 const pawnImg = new Image();
 const PI = Math.PI;
 
-pawnImg.src = '../src/p.png';
+pawnImg.src = 'p.png';
 
 let mouseX;
 let mouseY;
