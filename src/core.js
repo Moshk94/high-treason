@@ -102,6 +102,7 @@ class Pawn extends Piece {
             };
 
             if (this.y == newY && this.x == newX) {
+                ghostArray = [];
                 this.position = moveTo.newPosition;
                 moveTo = undefined;
             };
