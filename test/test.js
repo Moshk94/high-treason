@@ -15,6 +15,7 @@ pawnImg.src = 'p.png';
 let allPiece;
 let moveTo;
 let damgeInfo = [];
+let diagonals = [ -8,  -6,  +6,  +8];
 
 class Piece {
     animateHP(s = 1) {
@@ -222,7 +223,7 @@ class Pawn extends Piece {
         this.dealDamage(healValue)
     }
     attackPiece() {
-        let legalPositions = [this.position - 8, this.position - 6, this.position + 6, this.position + 8];
+        let legalPositions = diagonals.map(i => this.position + i)
         if (legalPositions.includes(queenPiece.position) && ghostArray[0].owner == this.type) {
             queenPiece.newHP -= (this.attack)
             queenPiece.dealDamage(-this.attack)
