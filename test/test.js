@@ -113,7 +113,7 @@ class Queen extends Piece {
         this.attack = 30;
         this.currentHP = 1;
         this.maxHP = 300;
-        this.newHP = 1;//this.maxHP;
+        this.newHP = this.maxHP;
         this.x = 130 + (this.getBoardCoords(position).x * 50);
         this.y = 180 + (50 * 0.8 * this.getBoardCoords(position).y);
     };
