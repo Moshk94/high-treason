@@ -14,18 +14,46 @@ pawnImg.src = 'p.png';
 
 let allPiece;
 let moveTo;
+let damgeInfo = [];
 
 class Piece {
-    animateHP(s = 1){
-     if(this.newHP > this.currentHP && this.newHP <= this.maxHP){
+    animateHP(s = 1) {
+        if (this.newHP > this.currentHP && this.newHP <= this.maxHP) {
             this.currentHP += s
-        } else   if (this.newHP < this.currentHP && this.newHP >= 0) {
+        } else if (this.newHP < this.currentHP && this.newHP >= 0) {
             this.currentHP -= s
         }
-        
+
         this.currentHP <= 0 ? this.currentHP = 0 : 0;
-        this.currentHP >= this.maxHP ? this.currentHP = this.maxHP : 0; 
+        this.currentHP >= this.maxHP ? this.currentHP = this.maxHP : 0;
+
+        this.newHP <= 0 ? this.newHP = 0 : 0;
+        this.newHP >= this.maxHP ? this.newHP = this.maxHP : 0;
+
     };
+    dealDamage(x) {
+        if (this.currentHP == this.maxHP && x > 0) {
+            x = 0
+        } else if (this.newHP > this.maxHP) {
+            x = Math.abs(this.maxHP - this.newHP)
+        }
+        console.log(x)
+
+        damgeInfo.push({
+            text: x,
+            x: this.x,
+            y: this.y,
+            yOrigin: this.y
+        });
+    };
+
+    buffAttack() {
+        if (this.constructor.name == "Queen") {
+            this.attack += 10;
+        } else {
+
+        }
+    }
     getBoardCoords(c) {
         return {
             x: (c - 1) % 7,
@@ -103,10 +131,11 @@ class Queen extends Piece {
 };
 
 class Moves extends Piece {
-    constructor(position, owner) {
+    constructor(position, owner, keycode) {
         super();
         this.position = position;
         this.owner = owner;
+        this.keycode = keycode
     };
     draw() {
         let ctxFilterString = `opacity(35%) sepia(100%) saturate(500%) hue-rotate(${this.owner}deg)`;
@@ -132,7 +161,7 @@ class Moves extends Piece {
 };
 
 class Pawn extends Piece {
-    constructor(position, type, attack) {
+    constructor(position, type, attack, keycode) {
         super();
         this.type = type;
         this.position = position;
@@ -141,7 +170,8 @@ class Pawn extends Piece {
         this.currentHP = 1;
         this.maxHP = 100;
         this.attack = attack;
-        this.newHP = this.maxHP;
+        this.newHP = 50; //this.maxHP;
+        this.keycode = keycode
     };
     draw(x = this.x, y = this.y, dx = 40, dy = 60) {
         if (moveTo != undefined && moveTo.owner == this.type) {
@@ -155,6 +185,7 @@ class Pawn extends Piece {
 
             if (newY != this.y) {
                 newY > this.y ? this.y += moveSpeed : this.y -= moveSpeed;
+
             };
 
             if (this.y == newY && this.x == newX) {
@@ -163,7 +194,6 @@ class Pawn extends Piece {
                 moveTo = undefined;
             };
         };
-
         let ctxFilterString = `sepia(100%) saturate(500%) hue-rotate(${this.type}deg)`;
 
         ctx.save();
@@ -172,7 +202,32 @@ class Pawn extends Piece {
         ctx.restore();
         this.animateHP();
     };
+    heal() {
+        let count = 1;
+        let arrPos = []
+        let healValue = 20;
+        for (let i = 0; i < pawnArray.length; i++) {
+            if (this.position - 8 == pawnArray[i].position || this.position + 8 == pawnArray[i].position || this.position - 6 == pawnArray[i].position || this.position + 6 == pawnArray[i].position) {
+                count++
+                arrPos.push(i)
+                healValue /= 2;
+            }
+        }
+        for (let i = 0; i < arrPos.length; i++) {
+            pawnArray[arrPos[i]].newHP += healValue;
+            pawnArray[arrPos[i]].dealDamage(healValue);
+        }
 
+        this.newHP += healValue;
+        this.dealDamage(healValue)
+    }
+    attackPiece() {
+        let legalPositions = [this.position - 8, this.position - 6, this.position + 6, this.position + 8];
+        if (legalPositions.includes(queenPiece.position) && ghostArray[0].owner == this.type) {
+            queenPiece.newHP -= (this.attack)
+            queenPiece.dealDamage(-this.attack)
+        }
+    }
     findLegalMoves() {
         let checkNorth = pawnArray.some(el => el.position === this.position - 7) || this.position - 7 == queenPiece.position;
         let checkSouth = pawnArray.some(el => el.position === this.position + 7) || this.position + 7 == queenPiece.position;
@@ -180,19 +235,19 @@ class Pawn extends Piece {
         let checkEast = pawnArray.some(el => el.position === this.position + 1) || this.position + 1 == queenPiece.position;
 
         if (this.position - 7 > 0 && !checkNorth) {
-            ghostArray.push(new Moves(this.position - 7, this.type));
+            ghostArray.push(new Moves(this.position - 7, this.type, 38));
         };
 
         if (this.position + (7 * 1) <= 49 && !checkSouth) {
-            ghostArray.push(new Moves(this.position + 7, this.type));
+            ghostArray.push(new Moves(this.position + 7, this.type, 40));
         };
 
         if (Math.ceil(this.position / 7) == Math.ceil((this.position - 1) / 7) && !checkWest) {
-            ghostArray.push(new Moves(this.position - 1, this.type));
+            ghostArray.push(new Moves(this.position - 1, this.type, 37));
         };
 
         if (Math.ceil(this.position / 7) == Math.ceil((this.position + 1) / 7) && !checkEast) {
-            ghostArray.push(new Moves(this.position + 1, this.type));
+            ghostArray.push(new Moves(this.position + 1, this.type, 39));
         };
     };
 };
@@ -200,13 +255,44 @@ class Pawn extends Piece {
 let queenPiece = new Queen(4);
 let ghostArray = [];
 export let pawnArray = [
-    new Pawn(44, 50, 10),
-    new Pawn(48, -60, 10),
-    new Pawn(39, 0, 20),
+    new Pawn(40, 50, 10, 49),
+    new Pawn(48, -60, 10, 51),
+    new Pawn(46, 0, 20, 50),
 ];
 
 canvas.addEventListener('keydown', function (e) {
-    console.log(e.keyCode)
+    console.log(e.keyCode);
+
+    if (ghostArray.length > 0) {
+        if (e.keyCode == 90 && ghostArray[0].owner == 50) {
+            pawnArray[0].heal();
+        }
+        pawnArray.forEach(f => {
+            if (e.keyCode == 88) {
+
+                f.attackPiece();
+            }
+        })
+        pawnArray.forEach(f => {
+            if (e.keyCode == 67 && ghostArray[0].owner == -60) {
+                f.buffAttack();
+            }
+        })
+    }
+
+    ghostArray.forEach(f => {
+        if (e.keyCode == f.keycode) {
+            f.click();
+        }
+    });
+    ghostArray = [];
+    pawnArray.forEach(f => {
+        f.selected = 0
+        if (e.keyCode == f.keycode) {
+            f.selected = 1
+            f.findLegalMoves();
+        }
+    })
 });
 
 setInterval(() => {
@@ -215,7 +301,20 @@ setInterval(() => {
     drawInformationSection();
     drawBoard();
     allPiece = [...ghostArray, ...pawnArray, queenPiece].sort(function (a, b) { return a.position - b.position });
-    allPiece.forEach(e => { e.draw(); });
+    allPiece.forEach(e => {
+        e.draw()
+    });
+
+    if (damgeInfo.length > 0) {
+        damgeInfo.forEach(e => {
+            let c;
+            e.text >= 0 ? c = 'green' : c = 'red';
+            drawText(Math.abs(e.text), e.x + 50, e.y--, 50, c)
+            if (e.y < e.yOrigin - 25) {
+                damgeInfo = [];
+            };
+        });
+    };
 
 }, 1 / 60);
 
