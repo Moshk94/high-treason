@@ -71,11 +71,10 @@ class Piece {
                     pawnArray[conditionTest].attack += 10
                     pawnArray[conditionTest].dealDamage(10)
 
-                }
-
-            })
-        }
-    }
+                };
+            });
+        };
+    };
     getBoardCoords(c) {
         return {
             x: (c - 1) % 7,
@@ -254,6 +253,7 @@ class Pawn extends Piece {
         };
     };
     findLegalMoves() {
+        // TODO: Refactor code
         let checkNorth = pawnArray.some(el => el.position === this.position - 7) || this.position - 7 == queenPiece.position;
         let checkSouth = pawnArray.some(el => el.position === this.position + 7) || this.position + 7 == queenPiece.position;
         let checkWest = pawnArray.some(el => el.position === this.position - 1) || this.position - 1 == queenPiece.position;
