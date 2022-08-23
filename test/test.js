@@ -41,13 +41,7 @@ class Piece {
             } else if (this.newHP > this.maxHP) {
                 x = Math.abs(this.maxHP - this.newHP)
             }
-        }
-
-        if (this.currentHP == this.maxHP && x > 0) {
-            x = 0
-        } else if (this.newHP > this.maxHP) {
-            x = Math.abs(this.maxHP - this.newHP)
-        }
+        };
 
         damgeInfo.push({
             text: x,
@@ -322,14 +316,17 @@ canvas.addEventListener('keydown', function (e) {
         if (ghostArray.length > 0) {
             if (e.keyCode == 88 && ghostArray[0].owner == 50) {
                 pawnArray[0].heal();
+                playerTurn = 0
             };
             pawnArray.forEach(f => {
                 if (e.keyCode == 90) {
                     f.attackPiece();
+                    playerTurn = 0
                 };
             });
             if (e.keyCode == 88 && ghostArray[0].owner == -60) {
                 pawnArray[1].buffAttack();
+                playerTurn = 0
             };
         }
     
@@ -383,6 +380,7 @@ setInterval(() => {
             } else {
                 sign +='A: +'
                 c = 'orange'
+                console.log(e.text)
             }
             drawText(sign + Math.abs(e.text), e.x + 50, e.y--, 40, c)
             if (e.y < e.yOrigin - 25) {
