@@ -16,6 +16,16 @@ let allPiece;
 let moveTo;
 
 class Piece {
+    animateHP(s = 1){
+     if(this.newHP > this.currentHP && this.newHP <= this.maxHP){
+            this.currentHP += s
+        } else   if (this.newHP < this.currentHP && this.newHP >= 0) {
+            this.currentHP -= s
+        }
+        
+        this.currentHP <= 0 ? this.currentHP = 0 : 0;
+        this.currentHP >= this.maxHP ? this.currentHP = this.maxHP : 0; 
+    };
     getBoardCoords(c) {
         return {
             x: (c - 1) % 7,
@@ -29,9 +39,9 @@ class Queen extends Piece {
         super();
         this.position = position;
         this.attack = 30;
-        this.currentHP = 100;
-        this.maxHP = 100;
-        this.newHP = this.currentHP;
+        this.currentHP = 1;
+        this.maxHP = 300;
+        this.newHP = this.maxHP;
     };
     draw() {
         this.drawQueenInformationSection();
@@ -42,9 +52,7 @@ class Queen extends Piece {
         ctx.drawImage(queenImg, this.x - 5, this.y - 20);
         ctx.restore();
 
-        if (this.newHP != this.currentHP && this.newHP >= 0) {
-            this.currentHP -= 1
-        }
+        this.animateHP(5);
 
     };
     drawQueenInformationSection() {
@@ -130,9 +138,10 @@ class Pawn extends Piece {
         this.position = position;
         this.x = 130 + (this.getBoardCoords(position).x * 50);
         this.y = 180 + (50 * 0.8 * this.getBoardCoords(position).y);
-        this.currentHP = 100;
+        this.currentHP = 1;
         this.maxHP = 100;
         this.attack = attack;
+        this.newHP = this.maxHP;
     };
     draw(x = this.x, y = this.y, dx = 40, dy = 60) {
         if (moveTo != undefined && moveTo.owner == this.type) {
@@ -157,13 +166,11 @@ class Pawn extends Piece {
 
         let ctxFilterString = `sepia(100%) saturate(500%) hue-rotate(${this.type}deg)`;
 
-        this.currentHP <= 0 ? this.currentHP = 0 : 0;
-        this.currentHP >= this.maxHP ? this.currentHP = this.maxHP : 0;
-
         ctx.save();
         ctx.filter = ctxFilterString;
         ctx.drawImage(pawnImg, x, y, dx, dy);
         ctx.restore();
+        this.animateHP();
     };
 
     findLegalMoves() {
