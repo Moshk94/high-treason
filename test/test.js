@@ -33,6 +33,33 @@ class Piece {
         this.newHP >= this.maxHP ? this.newHP = this.maxHP : 0;
 
     };
+
+    heal() {
+        if (this.constructor.name == "Queen") {
+            let healValue = 35;
+            this.newHP += healValue;
+            this.dealDamage(healValue, 'h');
+        } else {
+            let legalPositions = diagonals.map(i => this.position + i);
+            let piecesToHeal = [];
+            let healValue = 20;
+            legalPositions.forEach(e => {
+                let conditionTest = pawnArray.findIndex(a => a.position === e && a.currentHP != a.maxHP)
+                if (conditionTest >= 0) {
+                    piecesToHeal.push(conditionTest);
+                    healValue /= 2;
+                }
+            });
+
+            piecesToHeal.forEach(i => {
+                pawnArray[i].newHP += healValue;
+                pawnArray[i].dealDamage(healValue, 'h');
+            });
+
+            this.newHP += healValue;
+            this.dealDamage(healValue, 'h');
+        }
+    }
     dealDamage(x, t) {
         if (t !== undefined) {
 
@@ -55,6 +82,7 @@ class Piece {
     buffAttack() {
         if (this.constructor.name == "Queen") {
             this.attack += 10;
+            this.dealDamage(10)
         } else {
 
             let legalPositions = diagonals.map(i => this.position + i);
@@ -84,17 +112,17 @@ class Queen extends Piece {
         this.attack = 30;
         this.currentHP = 1;
         this.maxHP = 300;
-        this.newHP = this.maxHP;
+        this.newHP = 1;//this.maxHP;
         this.x = 130 + (this.getBoardCoords(position).x * 50);
         this.y = 180 + (50 * 0.8 * this.getBoardCoords(position).y);
     };
     draw() {
         if (moveTo != undefined && moveTo.owner == "Queen") {
-            
+
             let newX = 130 + (this.getBoardCoords(moveTo.newPosition).x * 50);
             let newY = 180 + (50 * 0.8 * this.getBoardCoords(moveTo.newPosition).y);
             let moveSpeed = 10;
-   
+
             if (newX != this.x) {
                 newX > this.x ? this.x += moveSpeed : this.x -= moveSpeed;
             };
@@ -103,7 +131,7 @@ class Queen extends Piece {
                 newY > this.y ? this.y += moveSpeed : this.y -= moveSpeed;
 
             };
-            
+
             if (this.y == newY && this.x == newX) {
                 ghostArray = [];
                 this.position = moveTo.newPosition;
@@ -165,12 +193,14 @@ class Queen extends Piece {
         ctx.drawImage(queenImg, boardX - 25, boardY - 130);
         ctx.restore();
     };
-    moveQueen(){
-        if(!playerTurn){
-            moveTo = {
-                newPosition: 2,
-                owner: 'Queen'
-            }
+    moveQueen() {
+        if (!playerTurn) {
+            // this.heal();
+            // this.buffAttack()
+            // moveTo = {
+            //     newPosition: 2,
+            //     owner: 'Queen'
+            // }
         }
     }
 };
@@ -248,28 +278,6 @@ class Pawn extends Piece {
         ctx.restore();
         this.animateHP();
     };
-    heal() {
-        let count = 1;
-        let legalPositions = diagonals.map(i => this.position + i);
-        let piecesToHeal = [];
-        let healValue = 20;
-        legalPositions.forEach(e => {
-            let conditionTest = pawnArray.findIndex(a => a.position === e && a.currentHP != a.maxHP)
-            if (conditionTest >= 0) {
-                count++;
-                piecesToHeal.push(conditionTest);
-                healValue /= 2;
-            }
-        });
-
-        piecesToHeal.forEach(i => {
-            pawnArray[i].newHP += healValue;
-            pawnArray[i].dealDamage(healValue, 'h');
-        });
-
-        this.newHP += healValue;
-        this.dealDamage(healValue, 'h');
-    }
     attackPiece() {
         let legalPositions = diagonals.map(i => this.position + i);
         if (legalPositions.includes(queenPiece.position) && ghostArray[0].owner == this.type) {
@@ -312,7 +320,7 @@ export let pawnArray = [
 
 canvas.addEventListener('keydown', function (e) {
     // console.log(e.keyCode);
-    if(playerTurn){
+    if (playerTurn) {
         if (ghostArray.length > 0) {
             if (e.keyCode == 88 && ghostArray[0].owner == 50) {
                 pawnArray[0].heal();
@@ -329,7 +337,7 @@ canvas.addEventListener('keydown', function (e) {
                 playerTurn = 0
             };
         }
-    
+
         ghostArray.forEach(f => {
             if (e.keyCode == f.keycode) {
                 f.click();
@@ -378,7 +386,7 @@ setInterval(() => {
                     sign += '-'
                 }
             } else {
-                sign +='A: +'
+                sign += 'A: +'
                 c = 'orange'
                 console.log(e.text)
             }
