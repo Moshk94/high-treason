@@ -18,6 +18,7 @@ let damgeInfo = [];
 let diagonals = [-8, -6, +6, +8];
 let straights = [-7, - 1, 1, 7];
 let playerTurn = 1;
+let turn = 0;
 class Piece {
     animateHP(s = 1) {
         if (this.newHP > this.currentHP && this.newHP <= this.maxHP) {
@@ -201,6 +202,7 @@ class Queen extends Piece {
             //     newPosition: 2,
             //     owner: 'Queen'
             // }
+            turn++
         }
     }
 };
