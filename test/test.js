@@ -17,7 +17,7 @@ let moveTo;
 let damgeInfo = [];
 let diagonals = [-8, -6, +6, +8];
 let straights = [-7, - 1, 1, 7];
-
+let playerTurn = 1;
 class Piece {
     animateHP(s = 1) {
         if (this.newHP > this.currentHP && this.newHP <= this.maxHP) {
@@ -91,11 +91,33 @@ class Queen extends Piece {
         this.currentHP = 1;
         this.maxHP = 300;
         this.newHP = this.maxHP;
+        this.x = 130 + (this.getBoardCoords(position).x * 50);
+        this.y = 180 + (50 * 0.8 * this.getBoardCoords(position).y);
     };
     draw() {
+        if (moveTo != undefined && moveTo.owner == "Queen") {
+            
+            let newX = 130 + (this.getBoardCoords(moveTo.newPosition).x * 50);
+            let newY = 180 + (50 * 0.8 * this.getBoardCoords(moveTo.newPosition).y);
+            let moveSpeed = 10;
+   
+            if (newX != this.x) {
+                newX > this.x ? this.x += moveSpeed : this.x -= moveSpeed;
+            };
+
+            if (newY != this.y) {
+                newY > this.y ? this.y += moveSpeed : this.y -= moveSpeed;
+
+            };
+            
+            if (this.y == newY && this.x == newX) {
+                ghostArray = [];
+                this.position = moveTo.newPosition;
+                moveTo = undefined;
+                playerTurn = 1
+            };
+        };
         this.drawQueenInformationSection();
-        this.x = 130 + (this.getBoardCoords(this.position).x * 50);
-        this.y = 180 + (50 * 0.8 * this.getBoardCoords(this.position).y);
         ctx.save();
         ctx.filter = 'sepia(100%) saturate(500%) hue-rotate(2deg)';
         ctx.drawImage(queenImg, this.x - 5, this.y - 20);
@@ -149,6 +171,14 @@ class Queen extends Piece {
         ctx.drawImage(queenImg, boardX - 25, boardY - 130);
         ctx.restore();
     };
+    moveQueen(){
+        if(!playerTurn){
+            moveTo = {
+                newPosition: 2,
+                owner: 'Queen'
+            }
+        }
+    }
 };
 
 class Moves extends Piece {
@@ -213,6 +243,7 @@ class Pawn extends Piece {
                 ghostArray = [];
                 this.position = moveTo.newPosition;
                 moveTo = undefined;
+                playerTurn = 0;
             };
         };
         let ctxFilterString = `sepia(100%) saturate(500%) hue-rotate(${this.type}deg)`;
@@ -286,34 +317,36 @@ export let pawnArray = [
 ];
 
 canvas.addEventListener('keydown', function (e) {
-    console.log(e.keyCode)
-    if (ghostArray.length > 0) {
-        if (e.keyCode == 88 && ghostArray[0].owner == 50) {
-            pawnArray[0].heal();
-        };
-        pawnArray.forEach(f => {
-            if (e.keyCode == 90) {
-                f.attackPiece();
+    // console.log(e.keyCode);
+    if(playerTurn){
+        if (ghostArray.length > 0) {
+            if (e.keyCode == 88 && ghostArray[0].owner == 50) {
+                pawnArray[0].heal();
             };
+            pawnArray.forEach(f => {
+                if (e.keyCode == 90) {
+                    f.attackPiece();
+                };
+            });
+            if (e.keyCode == 88 && ghostArray[0].owner == -60) {
+                pawnArray[1].buffAttack();
+            };
+        }
+    
+        ghostArray.forEach(f => {
+            if (e.keyCode == f.keycode) {
+                f.click();
+            }
         });
-        if (e.keyCode == 88 && ghostArray[0].owner == -60) {
-            pawnArray[1].buffAttack();
-        };
+        ghostArray = [];
+        pawnArray.forEach(f => {
+            f.selected = 0
+            if (e.keyCode == f.keycode) {
+                f.selected = 1
+                f.findLegalMoves();
+            }
+        })
     }
-
-    ghostArray.forEach(f => {
-        if (e.keyCode == f.keycode) {
-            f.click();
-        }
-    });
-    ghostArray = [];
-    pawnArray.forEach(f => {
-        f.selected = 0
-        if (e.keyCode == f.keycode) {
-            f.selected = 1
-            f.findLegalMoves();
-        }
-    })
 });
 
 setInterval(() => {
@@ -321,6 +354,7 @@ setInterval(() => {
     drawDebuggerGrid();
     drawInformationSection();
     drawBoard();
+    queenPiece.moveQueen()
     allPiece = [...ghostArray, ...pawnArray, queenPiece].sort(function (a, b) { return a.position - b.position });
     allPiece.forEach(e => {
         e.draw()
