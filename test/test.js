@@ -1,13 +1,14 @@
-import { drawDebuggerGrid, drawText, drawBoard } from "./debugTools";
+import { drawDebuggerGrid, drawText, drawBoard, drawInformationSection } from "./debugTools";
 
 export const ctx = document.getElementById('canvas').getContext("2d");
 export const boardX = 125;
 export const boardY = 200;
 export const cellSize = 50;
+
+export const PI = Math.PI;
+
 const pawnImg = new Image();
 const queenImg = new Image();
-const PI = Math.PI;
-
 queenImg.src = 'q.png'
 pawnImg.src = 'p.png';
 
@@ -132,7 +133,6 @@ class Pawn extends Piece {
         this.currentHP = 100;
         this.maxHP = 100;
         this.attack = attack;
-        this.attacking = 0
     };
     draw(x = this.x, y = this.y, dx = 40, dy = 60) {
         if (moveTo != undefined && moveTo.owner == this.type) {
@@ -165,12 +165,12 @@ class Pawn extends Piece {
         ctx.drawImage(pawnImg, x, y, dx, dy);
         ctx.restore();
     };
-    
+
     findLegalMoves() {
-        let checkNorth = pawnArray.some(el => el.position === this.position - 7) || this.position - 7 == queenArray.position;
-        let checkSouth = pawnArray.some(el => el.position === this.position + 7) || this.position + 7 == queenArray.position;
-        let checkWest = pawnArray.some(el => el.position === this.position - 1) || this.position - 1 == queenArray.position;
-        let checkEast = pawnArray.some(el => el.position === this.position + 1) || this.position + 1 == queenArray.position;
+        let checkNorth = pawnArray.some(el => el.position === this.position - 7) || this.position - 7 == queenPiece.position;
+        let checkSouth = pawnArray.some(el => el.position === this.position + 7) || this.position + 7 == queenPiece.position;
+        let checkWest = pawnArray.some(el => el.position === this.position - 1) || this.position - 1 == queenPiece.position;
+        let checkEast = pawnArray.some(el => el.position === this.position + 1) || this.position + 1 == queenPiece.position;
 
         if (this.position - 7 > 0 && !checkNorth) {
             ghostArray.push(new Moves(this.position - 7, this.type));
@@ -184,61 +184,31 @@ class Pawn extends Piece {
             ghostArray.push(new Moves(this.position - 1, this.type));
         };
 
-        
         if (Math.ceil(this.position / 7) == Math.ceil((this.position + 1) / 7) && !checkEast) {
             ghostArray.push(new Moves(this.position + 1, this.type));
         };
     };
 };
 
+let queenPiece = new Queen(4);
 let ghostArray = [];
-let pawnArray = [
+export let pawnArray = [
     new Pawn(44, 50, 10),
     new Pawn(48, -60, 10),
     new Pawn(39, 0, 20),
 ];
-let queenArray = new Queen(4);
+
+canvas.addEventListener('keydown', function (e) {
+    console.log(e.keyCode)
+});
 
 setInterval(() => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawDebuggerGrid();
     drawInformationSection();
     drawBoard();
-    allPiece = [...ghostArray, ...pawnArray, queenArray].sort(function (a, b) { return a.position - b.position });
+    allPiece = [...ghostArray, ...pawnArray, queenPiece].sort(function (a, b) { return a.position - b.position });
     allPiece.forEach(e => { e.draw(); });
 
 }, 1 / 60);
 
-
-function drawInformationSection() {
-    for (let i = 0; i < pawnArray.length; i++) {
-        const infoX = boardX - 50 + (175 * i);
-        const dx = 20;
-
-        ctx.fillStyle = "black";
-        ctx.fillRect(infoX, boardY + cellSize * 7 - 25, 130, 75);
-
-        ctx.fillStyle = "grey"
-        ctx.fillRect(infoX, boardY + cellSize * 7 - 25, 130, 20);
-
-        drawText(`${pawnArray[i].currentHP} / ${pawnArray[i].maxHP}`,infoX + 75,boardY + cellSize * 7 - 16,25,'white');
-
-        drawText(`Att: ${pawnArray[i].attack}`,infoX + 75,boardY + cellSize * 7 + 10,25,'darkred');
-
-        ctx.beginPath();
-        ctx.strokeStyle = 'red';
-        ctx.lineWidth = 3;
-        ctx.arc(infoX,boardY + cellSize * 7 - 10,20,0,2 * PI);
-        ctx.stroke();
-        ctx.fillStyle = "black"
-        ctx.fill();
-
-        ctx.beginPath();
-        ctx.strokeStyle = 'green';
-        ctx.lineWidth = 3;
-        ctx.arc(infoX,boardY + cellSize * 7 - 10,20,-PI / 2, (PI * 2) * pawnArray[i].currentHP / pawnArray[i].maxHP - PI / 2);
-        ctx.stroke();
-
-        pawnArray[i].draw(infoX - 10, boardY + cellSize * 7 - 25, dx, dx * 1.5);
-    };
-};
