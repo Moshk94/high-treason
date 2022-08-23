@@ -196,12 +196,22 @@ class Queen extends Piece {
     };
     moveQueen() {
         if (!playerTurn) {
-            // this.heal();
-            // this.buffAttack()
-            // moveTo = {
-            //     newPosition: 2,
-            //     owner: 'Queen'
-            // }
+            if (turn % 9 == 0) {
+                // TODO: Add curse Code
+                playerTurn = 1;
+            } else if (turn % 6 == 0) {
+                // this.heal();
+                playerTurn = 1;
+            } else if (turn % 3 == 0) {
+                // this.buffAttack();
+                playerTurn = 1;
+            } else {
+                // TODO: AI
+                moveTo = {
+                    newPosition: 2,
+                    owner: 'Queen'
+                }
+            };
             turn++
         }
     }
