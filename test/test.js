@@ -21,6 +21,8 @@ let playerTurn = 1;
 let turn = 0;
 let dt = 1 / 60;
 let time = 0;
+let queenTo;
+
 
 class Piece {
     animateHP(s = 1) {
@@ -119,8 +121,14 @@ class Queen extends Piece {
         this.newHP = this.maxHP;
         this.x = 130 + (this.getBoardCoords(position).x * 50);
         this.y = 180 + (50 * 0.8 * this.getBoardCoords(position).y);
+        this.canMove = 0;
     };
     draw() {
+        if (time > 0.5) {
+            this.canMove = 1;
+            queenPiece.moveQueen();
+        };
+
         if (moveTo != undefined && moveTo.owner == "Queen") {
 
             let newX = 130 + (this.getBoardCoords(moveTo.newPosition).x * 50);
@@ -198,15 +206,15 @@ class Queen extends Piece {
         ctx.restore();
     };
     moveQueen() {
-        if (!playerTurn) {
-            // TODO: AI
+        if (!playerTurn && this.canMove) {
+
             moveTo = {
-                newPosition: 1,
+                newPosition: queenTo,
                 owner: 'Queen'
-            }
-            turn++
-        }
-    }
+            };
+            turn++;
+        };
+    };
 };
 
 class Moves extends Piece {
@@ -253,8 +261,6 @@ class Pawn extends Piece {
         this.keycode = keycode
     };
     draw(x = this.x, y = this.y, dx = 40, dy = 60) {
-
-
         if (moveTo != undefined && moveTo.owner == this.type) {
             let newX = 130 + (this.getBoardCoords(moveTo.newPosition).x * 50);
             let newY = 180 + (50 * 0.8 * this.getBoardCoords(moveTo.newPosition).y);
@@ -409,13 +415,15 @@ setInterval(() => {
 
 function timingFunction() {
     dt++
-    if (dt > 60) {
-        time++;
+    if (dt > 30) {
+        time += 0.5;
         dt = 0;
     }
 };
 
 function endPlayerTurn() {
+    // TODO: AI
+    queenTo = Math.floor(Math.random() * 7) + 1;
     playerTurn = 0;
-    queenPiece.moveQueen();
+    time = 0;
 };
