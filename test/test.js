@@ -198,21 +198,24 @@ class Queen extends Piece {
         if (!playerTurn) {
             if (turn % 9 == 0) {
                 // TODO: Add curse Code
-                playerTurn = 1;
-            } else if (turn % 6 == 0) {
+                // playerTurn = 1;
+                // turn++
+            } else if (turn % 6 == 0 && this.currentHP < this.maxHP / 2) {
                 // this.heal();
-                playerTurn = 1;
+                // playerTurn = 1;
+                // turn++
             } else if (turn % 3 == 0) {
                 // this.buffAttack();
-                playerTurn = 1;
+                // playerTurn = 1;
+                // turn++
             } else {
                 // TODO: AI
                 moveTo = {
-                    newPosition: 2,
+                    newPosition: 1,
                     owner: 'Queen'
                 }
-            };
-            turn++
+                turn++
+            }
         }
     }
 };
@@ -261,6 +264,8 @@ class Pawn extends Piece {
         this.keycode = keycode
     };
     draw(x = this.x, y = this.y, dx = 40, dy = 60) {
+
+
         if (moveTo != undefined && moveTo.owner == this.type) {
             let newX = 130 + (this.getBoardCoords(moveTo.newPosition).x * 50);
             let newY = 180 + (50 * 0.8 * this.getBoardCoords(moveTo.newPosition).y);
@@ -275,11 +280,14 @@ class Pawn extends Piece {
 
             };
 
+
+
             if (this.y == newY && this.x == newX) {
                 ghostArray = [];
                 this.position = moveTo.newPosition;
                 moveTo = undefined;
-                playerTurn = 0;
+                playerTurn = 0
+                queenPiece.moveQueen();
             };
         };
         let ctxFilterString = `sepia(100%) saturate(500%) hue-rotate(${this.type}deg)`;
@@ -325,9 +333,12 @@ class Pawn extends Piece {
 let queenPiece = new Queen(4);
 let ghostArray = [];
 export let pawnArray = [
-    new Pawn(40, 50, 10, 49),
-    new Pawn(48, -60, 10, 51),
-    new Pawn(46, 0, 20, 50),
+    new Pawn(25, 50, 10, 49),
+    // new Pawn(40, 50, 10, 49),
+    new Pawn(25 + 14 + 2, -60, 10, 51),
+    // new Pawn(48, -60, 10, 51),
+    new Pawn(25 - 14 - 2, 0, 20, 50),
+    // new Pawn(46, 0, 20, 50),
 ];
 
 canvas.addEventListener('keydown', function (e) {
@@ -336,17 +347,23 @@ canvas.addEventListener('keydown', function (e) {
         if (ghostArray.length > 0) {
             if (e.keyCode == 88 && ghostArray[0].owner == 50) {
                 pawnArray[0].heal();
+
                 playerTurn = 0
+                queenPiece.moveQueen();
             };
             pawnArray.forEach(f => {
                 if (e.keyCode == 90) {
                     f.attackPiece();
+
                     playerTurn = 0
+                    queenPiece.moveQueen();
                 };
             });
             if (e.keyCode == 88 && ghostArray[0].owner == -60) {
                 pawnArray[1].buffAttack();
                 playerTurn = 0
+
+                queenPiece.moveQueen();
             };
         }
 
@@ -371,12 +388,11 @@ setInterval(() => {
     drawDebuggerGrid();
     drawInformationSection();
     drawBoard();
-    queenPiece.moveQueen()
     allPiece = [...ghostArray, ...pawnArray, queenPiece].sort(function (a, b) { return a.position - b.position });
+
     allPiece.forEach(e => {
         e.draw()
     });
-
     if (damgeInfo.length > 0) {
         damgeInfo.forEach(e => {
             let c;
@@ -400,7 +416,6 @@ setInterval(() => {
             } else {
                 sign += 'A: +'
                 c = 'orange'
-                console.log(e.text)
             }
             drawText(sign + Math.abs(e.text), e.x + 50, e.y--, 40, c)
             if (e.y < e.yOrigin - 25) {
@@ -410,4 +425,3 @@ setInterval(() => {
     };
 
 }, 1 / 60);
-
