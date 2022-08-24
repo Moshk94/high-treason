@@ -81,3 +81,28 @@ isWithinBounds() {
 };
 
 */
+
+
+/* INFO: Old queen action code
+ if (turn % 9 == 0) {
+                // TODO: Add curse Code
+                // playerTurn = 1;
+                // turn++
+            } else if (turn % 6 == 0 && this.currentHP < this.maxHP / 2) {
+                // this.heal();
+                // playerTurn = 1;
+                // turn++
+            } else if (turn % 3 == 0) {
+                // this.buffAttack();
+                // playerTurn = 1;
+                // turn++
+            } else {
+                // TODO: AI
+                moveTo = {
+                    newPosition: 1,
+                    owner: 'Queen'
+                }
+                turn++
+            }
+
+*/

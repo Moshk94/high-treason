@@ -199,26 +199,12 @@ class Queen extends Piece {
     };
     moveQueen() {
         if (!playerTurn) {
-            if (turn % 9 == 0) {
-                // TODO: Add curse Code
-                // playerTurn = 1;
-                // turn++
-            } else if (turn % 6 == 0 && this.currentHP < this.maxHP / 2) {
-                // this.heal();
-                // playerTurn = 1;
-                // turn++
-            } else if (turn % 3 == 0) {
-                // this.buffAttack();
-                // playerTurn = 1;
-                // turn++
-            } else {
-                // TODO: AI
-                moveTo = {
-                    newPosition: 1,
-                    owner: 'Queen'
-                }
-                turn++
+            // TODO: AI
+            moveTo = {
+                newPosition: 1,
+                owner: 'Queen'
             }
+            turn++
         }
     }
 };
@@ -283,14 +269,11 @@ class Pawn extends Piece {
 
             };
 
-
-
             if (this.y == newY && this.x == newX) {
                 ghostArray = [];
                 this.position = moveTo.newPosition;
                 moveTo = undefined;
-                playerTurn = 0
-                queenPiece.moveQueen();
+                endPlayerTurn();
             };
         };
         let ctxFilterString = `sepia(100%) saturate(500%) hue-rotate(${this.type}deg)`;
@@ -350,23 +333,17 @@ canvas.addEventListener('keydown', function (e) {
         if (ghostArray.length > 0) {
             if (e.keyCode == 88 && ghostArray[0].owner == 50) {
                 pawnArray[0].heal();
-
-                playerTurn = 0
-                queenPiece.moveQueen();
+                endPlayerTurn();
             };
             pawnArray.forEach(f => {
                 if (e.keyCode == 90) {
                     f.attackPiece();
-
-                    playerTurn = 0
-                    queenPiece.moveQueen();
+                    endPlayerTurn();
                 };
             });
             if (e.keyCode == 88 && ghostArray[0].owner == -60) {
                 pawnArray[1].buffAttack();
-                playerTurn = 0
-
-                queenPiece.moveQueen();
+                endPlayerTurn();
             };
         }
 
@@ -432,8 +409,13 @@ setInterval(() => {
 
 function timingFunction() {
     dt++
-    if(dt > 60){
+    if (dt > 60) {
         time++;
         dt = 0;
     }
+};
+
+function endPlayerTurn() {
+    playerTurn = 0;
+    queenPiece.moveQueen();
 };
