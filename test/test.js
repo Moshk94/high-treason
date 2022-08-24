@@ -19,6 +19,9 @@ let diagonals = [-8, -6, +6, +8];
 let straights = [-7, - 1, 1, 7];
 let playerTurn = 1;
 let turn = 0;
+let dt = 1 / 60;
+let time = 0;
+
 class Piece {
     animateHP(s = 1) {
         if (this.newHP > this.currentHP && this.newHP <= this.maxHP) {
@@ -423,5 +426,14 @@ setInterval(() => {
             };
         });
     };
-
+    timingFunction();
 }, 1 / 60);
+
+
+function timingFunction() {
+    dt++
+    if(dt > 60){
+        time++;
+        dt = 0;
+    }
+};
