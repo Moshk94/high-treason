@@ -81,17 +81,7 @@ export function drawInformationSection() {
         ctx.lineWidth = 3;
         ctx.arc(infoX,boardY + cellSize * 7 - 10,20,-PI / 2, (PI * 2) * pawnArray[i].currentHP / pawnArray[i].maxHP - PI / 2);
         ctx.stroke();
-
         
         pawnArray[i].draw(infoX - 10, boardY + cellSize * 7 - 25, dx, dx * 1.5);
-
-        ctx.fillStyle = "grey"
-        ctx.fillRect(infoX, boardY + cellSize * 7 + 30, 20, 20);
-
-        drawText(`${i+1}`,infoX + 10,boardY + cellSize * 7 + 40,25,'white');
-
-        
-    drawText(`Pos: ${pawnArray[i].position}`,infoX + 60,boardY + cellSize * 7 + 40,25,'yellow');
-    drawText(`${pawnArray[i].type}`,infoX + 60,boardY + cellSize * 7 + 25,25,'yellow');
     };
 };
