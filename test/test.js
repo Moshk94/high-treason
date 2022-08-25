@@ -17,10 +17,10 @@ queenImg.src = 'q.png'
 pawnImg.src = 'p.png';
 
 let diagonals = [
-    {x:50,y:-40}, // NE
-    {x:50,y:40}, // SE
-    {x:-50,y:40}, // SW
-    {x:-50,y:-40} // SE
+    { x: 50, y: -40 }, // NE
+    { x: 50, y: 40 }, // SE
+    { x: -50, y: 40 }, // SW
+    { x: -50, y: -40 } // SE
 ]
 let playerTurn = 1;
 let allPiece;
@@ -41,31 +41,7 @@ class Piece {
         this.newHP <= 0 ? this.newHP = 0 : 0;
         this.newHP >= this.maxHP ? this.newHP = this.maxHP : 0;
     };
-    heal(){
-        let healValue;
-        let piecesToHeal = [];
-        diagonals = [{x:50,y:-40},{x:50,y:40},{x:-50,y:40},{x:-50,y:-40}]
-        
-        healValue = 20;
-        diagonals.forEach(d =>{
-            d.x += this.x
-            d.y += this.y
-
-            let c = playerPieces.findIndex(a => a.x === d.x &&  a.y === d.y && a.currentHP != a.maxHP)
-            if (c >= 0) {
-                piecesToHeal.push(c);
-                healValue /= 2;
-            }
-        });
-
-        piecesToHeal.forEach(i => {
-            playerPieces[i].newHP += healValue;
-        });
-        
-        this.newHP += healValue;
-    }
     animateMovement() {
-
         if (this.newX < this.x) {
             this.x -= movementSpeed
         } else if (this.newX > this.x) {
@@ -79,7 +55,46 @@ class Piece {
             this.y += movementSpeed
         }
     }
-    buffAttack() { };
+    heal() {
+        let healValue;
+        let piecesToHeal = [];
+        diagonals = [{ x: 50, y: -40 }, { x: 50, y: 40 }, { x: -50, y: 40 }, { x: -50, y: -40 }]
+
+        healValue = 20;
+        diagonals.forEach(d => {
+            d.x += this.x
+            d.y += this.y
+
+            let c = playerPieces.findIndex(a => a.x === d.x && a.y === d.y && a.currentHP != a.maxHP)
+            if (c >= 0) {
+                piecesToHeal.push(c);
+                healValue /= 2;
+            }
+        });
+
+        piecesToHeal.forEach(i => {
+            playerPieces[i].newHP += healValue;
+        });
+
+        this.newHP += healValue;
+    }
+    buffAttack() {
+        
+        diagonals = [{ x: 50, y: -40 }, { x: 50, y: 40 }, { x: -50, y: 40 }, { x: -50, y: -40 }];
+
+        diagonals.forEach(d => {
+            d.x += this.x
+            d.y += this.y
+
+            let c = playerPieces.findIndex(a => a.x === d.x && a.y === d.y)
+            if (c >= 0) {
+                playerPieces[c].attack += 10
+            }
+        });
+
+        this.attack +=10
+
+    };
 };
 
 
@@ -90,9 +105,14 @@ class Moves extends Piece {
         this.y = p.y
         this.owner = p.o
         this.direction = p.d
+        this.key = p.k
     };
     draw() {
-        let ctxFilterString = `opacity(35%) sepia(100%) saturate(500%) hue-rotate(${50}deg)`;
+        let deg;
+        this.key == 49 ? deg = 50 : 0;
+        this.key == 50 ? deg = -60 : 0;
+        this.key == 51 ? deg = 0 : 0;
+        let ctxFilterString = `opacity(35%) sepia(100%) saturate(500%) hue-rotate(${deg}deg)`;
         ctx.save();
         ctx.filter = ctxFilterString;
         ctx.drawImage(pawnImg, this.x, this.y);
@@ -101,22 +121,30 @@ class Moves extends Piece {
 };
 
 class Pawn extends Piece {
-    constructor(keycode) {
+    constructor(keycode, x, y) {
         super();
-        this.x = 130 + (50 * 5)
-        this.y = 180 + (40 * 5)
+        this.x = 130 + (50 * x)
+        this.y = 180 + (40 * y)
         this.currentHP = 1;
         this.maxHP = 100;
-        this.attack = 0;
+        this.attack = keycode == 51? 20:10;
         this.newHP = 1;//this.maxHP;
-        this.keycode = keycode;
+        this.key = keycode;
         this.newX = this.x;
         this.newY = this.y;
+        this.ctxFilterString
     };
     draw(x = this.x, y = this.y, w = 40, h = 60) {
-        let ctxFilterString = `sepia(100%) saturate(500%) hue-rotate(${50}deg)`;
+        let deg;
+
+        this.key == 49 ? deg = 50 : 0;
+        this.key == 50 ? deg = -60 : 0;
+        this.key == 51 ? deg = 0 : 0;
+
+
+        this.ctxFilterString = `sepia(100%) saturate(500%) hue-rotate(${deg}deg)`;
         ctx.save();
-        ctx.filter = ctxFilterString;
+        ctx.filter = this.ctxFilterString;
         ctx.drawImage(pawnImg, x, y, w, h);
         ctx.restore();
         this.animateHP();
@@ -124,28 +152,28 @@ class Pawn extends Piece {
     };
     attackPiece() { };
     findLegalMoves(p) {
-        if (p == this.keycode) {
-            playerPieces.forEach(p => {p.selected = 0})
+        if (p == this.key) {
+            playerPieces.forEach(p => { p.selected = 0 })
             availableMoves = [];
             this.selected = 1;
             let checkEast = playerPieces.some(el => el.x === this.x + 50 && this.y === el.y);
             let checkWest = playerPieces.some(el => el.x === this.x - 50 && this.y === el.y);
-            let checkNorth =  playerPieces.some(el => el.y === this.y - 40 && this.x === el.x);
-            let checkSouth =  playerPieces.some(el => el.y === this.y + 40 && this.x === el.x);
-            
+            let checkNorth = playerPieces.some(el => el.y === this.y - 40 && this.x === el.x);
+            let checkSouth = playerPieces.some(el => el.y === this.y + 40 && this.x === el.x);
+
             if (this.x - 50 >= 130 && !checkWest) {
-                availableMoves.push(new Moves({ x: this.x - 50, y: this.y, d: 37}))
+                availableMoves.push(new Moves({k:this.key, x: this.x - 50, y: this.y, d: 37 }))
             }
             if (this.x + 50 < 480 && !checkEast) {
-                availableMoves.push(new Moves({ x: this.x + 50, y: this.y, d: 39  }))
+                availableMoves.push(new Moves({k:this.key, x: this.x + 50, y: this.y, d: 39 }))
             }
 
-            if(this.y - 40 >= 180 && !checkNorth){
-                availableMoves.push(new Moves({ x: this.x, y: this.y - 40, d: 38  }))
+            if (this.y - 40 >= 180 && !checkNorth) {
+                availableMoves.push(new Moves({k:this.key, x: this.x, y: this.y - 40, d: 38 }))
             }
 
-            if(this.y + 40 < 460 && !checkSouth){
-                availableMoves.push(new Moves({ x: this.x, y: this.y + 40, d: 40  }))
+            if (this.y + 40 < 460 && !checkSouth) {
+                availableMoves.push(new Moves({k:this.key, x: this.x, y: this.y + 40, d: 40 }))
             }
         };
     };
@@ -153,27 +181,27 @@ class Pawn extends Piece {
 
 let availableMoves = [];
 export let playerPieces = [
-    new Pawn(49),
-    new Pawn(50),
-    new Pawn(51),
+    new Pawn(49, 3, 3),
+    new Pawn(50, 4, 4),
+    new Pawn(51, 2, 4),
 ];
 
 canvas.addEventListener('keydown', function (e) {
-    console.log(e.keyCode);
+    // console.log(e.keyCode);
     playerPieces.forEach(p => {
-        if(p.selected){
+        if (p.selected) {
             let findD = availableMoves.findIndex(ee => ee.direction == e.keyCode);
-            if(findD >= 0){
-                if(e.keyCode == 38){
+            if (findD >= 0) {
+                if (e.keyCode == 38) {
                     p.newY -= 40;
                 }
-                if(e.keyCode == 37){
+                if (e.keyCode == 37) {
                     p.newX -= 50;
                 }
-                if(e.keyCode == 39){
+                if (e.keyCode == 39) {
                     p.newX += 50;
                 }
-                if(e.keyCode == 40){
+                if (e.keyCode == 40) {
                     p.newY += 40;
                 }
                 p.selected = 0;
@@ -181,6 +209,10 @@ canvas.addEventListener('keydown', function (e) {
             if (e.keyCode == 88 && playerPieces[0].selected) {
                 playerPieces[0].heal();
                 playerPieces[0].selected = 0;
+            };
+            if (e.keyCode == 88 && playerPieces[1].selected) {
+                playerPieces[1].buffAttack();
+                playerPieces[1].selected = 0;
             };
             availableMoves = [];
         }
