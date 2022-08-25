@@ -15,6 +15,8 @@ const pawnImg = new Image();
 const queenImg = new Image();
 queenImg.src = 'q.png'
 pawnImg.src = 'p.png';
+let infoTextLocation = [];
+let playSpecial = 0;
 
 let diagonals = [
     { x: 50, y: -40 }, // NE
@@ -47,19 +49,23 @@ class Piece {
             this.newX > this.x ? this.x += movementSpeed : 0;
             this.newY > this.y ? this.y += movementSpeed : 0;
             this.newY < this.y ? this.y -= movementSpeed : 0;
+            if(this.newY - 5 == this.y && infoTextLocation.length != 0){
+                playSpecial = 1;
+            }
         } else {
             this.tempY < this.y ? this.y -= movementSpeed / 2 : 0;
-            this.tempY == this.y ? this.tempY = undefined : 0;
-        }
-
+            if (this.tempY == this.y) {
+                this.tempY = undefined;
+            };
+        };
     };
     animateSpecial() {
         this.tempY = this.y - 35
-    }
+    };
     heal() {
         let healValue;
         if (this.constructor.name == "Queen") {
-            healValue = 35
+            healValue = 35;
         } else {
             let piecesToHeal = [];
             diagonals = [{ x: 50, y: -40 }, { x: 50, y: 40 }, { x: -50, y: 40 }, { x: -50, y: -40 }]
@@ -78,9 +84,10 @@ class Piece {
 
             piecesToHeal.forEach(i => {
                 playerPieces[i].newHP += healValue;
+                infoTextLocation.push({x:playerPieces[i].x, y:playerPieces[i].y, v:healValue, o:playerPieces[i].y})
             });
         };
-
+        infoTextLocation.push({x:this.x, y:this.y, v:healValue, o:this.y})
         this.newHP += healValue;
         this.animateSpecial();
     }
@@ -136,7 +143,7 @@ class Pawn extends Piece {
         this.currentHP = 1;
         this.maxHP = 100;
         this.attack = keycode == 51 ? 20 : 10;
-        this.newHP = this.maxHP;
+        this.newHP = 5; //this.maxHP;
         this.key = keycode;
         this.newX = this.x;
         this.newY = this.y;
@@ -249,13 +256,13 @@ class Queen extends Piece {
 let queenPiece = new Queen();
 let availableMoves = [];
 export let playerPieces = [
-    new Pawn(49, 3, 3),
+    new Pawn(49, 3, 2),
     new Pawn(50, 4, 1),
     new Pawn(51, 2, 1),
 ];
 
 canvas.addEventListener('keydown', function (e) {
-    console.log(e.keyCode);
+    // console.log(e.keyCode);
     playerPieces.forEach(p => {
         if (p.selected) {
             let findD = availableMoves.findIndex(ee => ee.direction == e.keyCode);
@@ -301,7 +308,7 @@ setInterval(() => {
     allPiece.forEach(e => {
         e.draw()
     });
-
+    drawInfoText();
     timingFunction();
 }, 1 / 60);
 
@@ -310,5 +317,21 @@ function timingFunction() {
     if (dt > 30) {
         time += 0.5;
         dt = 0;
+    };
+};
+
+function drawInfoText(){
+    if(playSpecial == 1){
+        infoTextLocation.forEach(i =>{
+            let c;
+            let sign = '';
+                c = 'green'
+    
+            drawText(sign + Math.abs(i.v), i.x + 25, i.y--, 40, c)
+            if (i.y < i.o - 25) {
+                infoTextLocation = [];
+                playSpecial = 0
+            };
+        });
     };
 };
