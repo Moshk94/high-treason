@@ -16,6 +16,12 @@ const queenImg = new Image();
 queenImg.src = 'q.png'
 pawnImg.src = 'p.png';
 
+let diagonals = [
+    {x:50,y:-40}, // NE
+    {x:50,y:40}, // SE
+    {x:-50,y:40}, // SW
+    {x:-50,y:-40} // SE
+]
 let playerTurn = 1;
 let allPiece;
 let dt = 1 / 60;
@@ -37,8 +43,25 @@ class Piece {
     };
     heal(){
         let healValue;
-
+        let piecesToHeal = [];
+        diagonals = [{x:50,y:-40},{x:50,y:40},{x:-50,y:40},{x:-50,y:-40}]
+        
         healValue = 20;
+        diagonals.forEach(d =>{
+            d.x += this.x
+            d.y += this.y
+
+            let c = playerPieces.findIndex(a => a.x === d.x &&  a.y === d.y && a.currentHP != a.maxHP)
+            if (c >= 0) {
+                piecesToHeal.push(c);
+                healValue /= 2;
+            }
+        });
+
+        piecesToHeal.forEach(i => {
+            playerPieces[i].newHP += healValue;
+        });
+        
         this.newHP += healValue;
     }
     animateMovement() {
@@ -131,7 +154,8 @@ class Pawn extends Piece {
 let availableMoves = [];
 export let playerPieces = [
     new Pawn(49),
-    new Pawn(50)
+    new Pawn(50),
+    new Pawn(51),
 ];
 
 canvas.addEventListener('keydown', function (e) {
@@ -152,9 +176,9 @@ canvas.addEventListener('keydown', function (e) {
                 if(e.keyCode == 40){
                     p.newY += 40;
                 }
+                p.selected = 0;
             }
             if (e.keyCode == 88 && playerPieces[0].selected) {
-                console.log(playerPieces[0])
                 playerPieces[0].heal();
                 playerPieces[0].selected = 0;
             };
