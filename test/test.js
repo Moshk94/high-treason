@@ -71,6 +71,7 @@ class Piece {
         let healValue;
         if (this.constructor.name == "Queen") {
             healValue = 35;
+            infoTextLocation.push({ x: this.x, y: this.y, v: healValue, o: this.y, t:'h' })
         } else {
             let piecesToHeal = [];
             diagonals = [{ x: 50, y: -40 }, { x: 50, y: 40 }, { x: -50, y: 40 }, { x: -50, y: -40 }]
@@ -97,7 +98,9 @@ class Piece {
         this.animateSpecial();
     }
     buffAttack() {
+        let attackBuffValue = 10;
         if (this.constructor.name == "Pawn") {
+            attackBuffValue /=2
             diagonals = [{ x: 50, y: -40 }, { x: 50, y: 40 }, { x: -50, y: 40 }, { x: -50, y: -40 }];
 
             diagonals.forEach(d => {
@@ -108,13 +111,13 @@ class Piece {
                 let c = playerPieces.findIndex(a => a.x === d.x && a.y === d.y);
                 if (c >= 0) {
                     playerPieces[c].attack += 10;
-                    infoTextLocation.push({ x: playerPieces[c].x, y: playerPieces[c].y, v: 10, o: playerPieces[c].y, t:'a' })
+                    infoTextLocation.push({ x: playerPieces[c].x, y: playerPieces[c].y, v: attackBuffValue*2, o: playerPieces[c].y, t:'a' })
                 };
             });
         };
 
-        infoTextLocation.push({ x: this.x, y: this.y, v: 5, o: this.y, t:'a' })
-        this.attack += 5;
+        infoTextLocation.push({ x: this.x, y: this.y, v: attackBuffValue, o: this.y, t:'a' })
+        this.attack += attackBuffValue;
         this.animateSpecial();
 
     };
