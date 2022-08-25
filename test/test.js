@@ -89,10 +89,10 @@ class Piece {
 
             piecesToHeal.forEach(i => {
                 playerPieces[i].newHP += healValue;
-                infoTextLocation.push({ x: playerPieces[i].x, y: playerPieces[i].y, v: healValue, o: playerPieces[i].y })
+                infoTextLocation.push({ x: playerPieces[i].x, y: playerPieces[i].y, v: healValue, o: playerPieces[i].y, t:'h' })
             });
         };
-        infoTextLocation.push({ x: this.x, y: this.y, v: healValue, o: this.y })
+        infoTextLocation.push({ x: this.x, y: this.y, v: healValue, o: this.y, t:'h' })
         this.newHP += healValue;
         this.animateSpecial();
     }
@@ -108,10 +108,12 @@ class Piece {
                 let c = playerPieces.findIndex(a => a.x === d.x && a.y === d.y);
                 if (c >= 0) {
                     playerPieces[c].attack += 10;
+                    infoTextLocation.push({ x: playerPieces[c].x, y: playerPieces[c].y, v: 10, o: playerPieces[c].y, t:'a' })
                 };
             });
         };
 
+        infoTextLocation.push({ x: this.x, y: this.y, v: 10, o: this.y, t:'a' })
         this.attack += 10;
         this.animateSpecial();
 
@@ -331,7 +333,12 @@ function drawInfoText() {
             let sign = i.v >= 0 ? '+' : '-';
 
             ctx.save();
-            ctx.drawImage(heartImg, i.x, i.y--,20,20);
+            if(i.t == 'h'){
+
+                ctx.drawImage(heartImg, i.x, i.y--,20,20);
+            } else if(i.t == 'a'){
+                ctx.drawImage(swordImg, i.x, i.y--,20,20);
+            }
             ctx.restore();
             drawText(sign + Math.abs(i.v), i.x + 50, (i.y+9), 40, 'white')
             if (i.y < i.o - 35) {
