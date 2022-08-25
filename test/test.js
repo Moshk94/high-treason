@@ -43,6 +43,12 @@ class Piece {
 
             this.x += movementSpeed
         }
+        if (this.newY < this.y) {
+            this.y -= movementSpeed
+        } else if (this.newY > this.y) {
+
+            this.y += movementSpeed
+        }
     }
     heal() { };
     buffAttack() { };
@@ -54,17 +60,16 @@ class Moves extends Piece {
         super();
         this.x = p.x
         this.y = p.y
+        this.owner = p.o
+        this.direction = p.d
     };
     draw() {
         let ctxFilterString = `opacity(35%) sepia(100%) saturate(500%) hue-rotate(${50}deg)`;
-
-
         ctx.save();
         ctx.filter = ctxFilterString;
         ctx.drawImage(pawnImg, this.x, this.y);
         ctx.restore();
     };
-    select() { };
 };
 
 class Pawn extends Piece {
@@ -78,6 +83,7 @@ class Pawn extends Piece {
         this.newHP = this.maxHP;
         this.keycode = keycode;
         this.newX = this.x;
+        this.newY = this.y;
     };
     draw(x = this.x, y = this.y, w = 40, h = 60) {
         let ctxFilterString = `sepia(100%) saturate(500%) hue-rotate(${50}deg)`;
@@ -91,25 +97,27 @@ class Pawn extends Piece {
     attackPiece() { };
     findLegalMoves(p) {
         if (p == this.keycode) {
+            playerPieces.forEach(p => {p.selected = 0})
             availableMoves = [];
-            let checkEast = playerPieces.some(el => el.position === this.x - 50);
-            let checkWest = playerPieces.some(el => el.position === this.x + 50);
-            let checkNorth =  playerPieces.some(el => el.position === this.x - 50);
-            let checkSouth =  playerPieces.some(el => el.position === this.x + 50);
-
-            if (this.x - 50 > 130 && !checkEast) {
-                availableMoves.push(new Moves({ x: this.x - 50, y: this.y }))
+            this.selected = 1;
+            let checkEast = playerPieces.some(el => el.x === this.x + 50 && this.y === el.y);
+            let checkWest = playerPieces.some(el => el.x === this.x - 50 && this.y === el.y);
+            let checkNorth =  playerPieces.some(el => el.y === this.y - 40 && this.x === el.x);
+            let checkSouth =  playerPieces.some(el => el.y === this.y + 40 && this.x === el.x);
+            
+            if (this.x - 50 >= 130 && !checkWest) {
+                availableMoves.push(new Moves({ x: this.x - 50, y: this.y, d: 37}))
             }
-            if (this.x + 50 < 480 && !checkWest) {
-                availableMoves.push(new Moves({ x: this.x + 50, y: this.y }))
+            if (this.x + 50 < 480 && !checkEast) {
+                availableMoves.push(new Moves({ x: this.x + 50, y: this.y, d: 39  }))
             }
 
-            if(this.y - 40 > 180 && !checkNorth){
-                availableMoves.push(new Moves({ x: this.x, y: this.y - 40 }))
+            if(this.y - 40 >= 180 && !checkNorth){
+                availableMoves.push(new Moves({ x: this.x, y: this.y - 40, d: 38  }))
             }
 
             if(this.y + 40 < 460 && !checkSouth){
-                availableMoves.push(new Moves({ x: this.x, y: this.y + 40 }))
+                availableMoves.push(new Moves({ x: this.x, y: this.y + 40, d: 40  }))
             }
         };
     };
@@ -117,12 +125,31 @@ class Pawn extends Piece {
 
 let availableMoves = [];
 export let playerPieces = [
-    new Pawn(49)
+    new Pawn(49),
+    new Pawn(50) 
 ];
 
 canvas.addEventListener('keydown', function (e) {
-    console.log(e.keyCode);
+    // console.log(e.keyCode);
     playerPieces.forEach(p => {
+        if(p.selected){
+            let findD = availableMoves.findIndex(ee => ee.direction == e.keyCode);
+            if(findD >= 0){
+                if(e.keyCode == 38){
+                    p.newY -= 40;
+                }
+                if(e.keyCode == 37){
+                    p.newX -= 50;
+                }
+                if(e.keyCode == 39){
+                    p.newX += 50;
+                }
+                if(e.keyCode == 40){
+                    p.newY += 40;
+                }
+            }
+            availableMoves = [];
+        }
         p.findLegalMoves(e.keyCode);
     });
 });
