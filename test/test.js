@@ -113,8 +113,8 @@ class Piece {
             });
         };
 
-        infoTextLocation.push({ x: this.x, y: this.y, v: 10, o: this.y, t:'a' })
-        this.attack += 10;
+        infoTextLocation.push({ x: this.x, y: this.y, v: 5, o: this.y, t:'a' })
+        this.attack += 5;
         this.animateSpecial();
 
     };
@@ -150,7 +150,7 @@ class Pawn extends Piece {
         this.currentHP = 1;
         this.maxHP = 100;
         this.attack = keycode == 51 ? 20 : 10;
-        this.newHP = 5; //this.maxHP;
+        this.newHP = this.maxHP;
         this.key = keycode;
         this.newX = this.x;
         this.newY = this.y;
@@ -162,7 +162,6 @@ class Pawn extends Piece {
         this.key == 49 ? deg = 65 : 0;
         this.key == 50 ? deg = -60 : 0;
         this.key == 51 ? deg = 180 : 0;
-
 
         this.ctxFilterString = `sepia(100%) saturate(500%) hue-rotate(${deg}deg)`;
         ctx.save();
