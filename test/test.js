@@ -35,6 +35,12 @@ class Piece {
         this.newHP <= 0 ? this.newHP = 0 : 0;
         this.newHP >= this.maxHP ? this.newHP = this.maxHP : 0;
     };
+    heal(){
+        let healValue;
+
+        healValue = 20;
+        this.newHP += healValue;
+    }
     animateMovement() {
 
         if (this.newX < this.x) {
@@ -50,7 +56,6 @@ class Piece {
             this.y += movementSpeed
         }
     }
-    heal() { };
     buffAttack() { };
 };
 
@@ -80,7 +85,7 @@ class Pawn extends Piece {
         this.currentHP = 1;
         this.maxHP = 100;
         this.attack = 0;
-        this.newHP = this.maxHP;
+        this.newHP = 1;//this.maxHP;
         this.keycode = keycode;
         this.newX = this.x;
         this.newY = this.y;
@@ -126,11 +131,11 @@ class Pawn extends Piece {
 let availableMoves = [];
 export let playerPieces = [
     new Pawn(49),
-    new Pawn(50) 
+    new Pawn(50)
 ];
 
 canvas.addEventListener('keydown', function (e) {
-    // console.log(e.keyCode);
+    console.log(e.keyCode);
     playerPieces.forEach(p => {
         if(p.selected){
             let findD = availableMoves.findIndex(ee => ee.direction == e.keyCode);
@@ -148,6 +153,11 @@ canvas.addEventListener('keydown', function (e) {
                     p.newY += 40;
                 }
             }
+            if (e.keyCode == 88 && playerPieces[0].selected) {
+                console.log(playerPieces[0])
+                playerPieces[0].heal();
+                playerPieces[0].selected = 0;
+            };
             availableMoves = [];
         }
         p.findLegalMoves(e.keyCode);
