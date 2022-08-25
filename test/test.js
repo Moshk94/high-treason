@@ -49,7 +49,7 @@ class Piece {
             this.newX > this.x ? this.x += movementSpeed : 0;
             this.newY > this.y ? this.y += movementSpeed : 0;
             this.newY < this.y ? this.y -= movementSpeed : 0;
-            if(this.newY - 5 == this.y && infoTextLocation.length != 0){
+            if (this.newY - 5 == this.y && infoTextLocation.length != 0) {
                 playSpecial = 1;
             }
         } else {
@@ -84,10 +84,10 @@ class Piece {
 
             piecesToHeal.forEach(i => {
                 playerPieces[i].newHP += healValue;
-                infoTextLocation.push({x:playerPieces[i].x, y:playerPieces[i].y, v:healValue, o:playerPieces[i].y})
+                infoTextLocation.push({ x: playerPieces[i].x, y: playerPieces[i].y, v: healValue, o: playerPieces[i].y })
             });
         };
-        infoTextLocation.push({x:this.x, y:this.y, v:healValue, o:this.y})
+        infoTextLocation.push({ x: this.x, y: this.y, v: healValue, o: this.y })
         this.newHP += healValue;
         this.animateSpecial();
     }
@@ -320,15 +320,15 @@ function timingFunction() {
     };
 };
 
-function drawInfoText(){
-    if(playSpecial == 1){
-        infoTextLocation.forEach(i =>{
+function drawInfoText() {
+    if (playSpecial == 1) {
+        infoTextLocation.forEach(i => {
             let c;
-            let sign = '';
-                c = 'green'
-    
-            drawText(sign + Math.abs(i.v), i.x + 25, i.y--, 40, c)
-            if (i.y < i.o - 25) {
+            let sign = i.v >= 0 ? '+' : '-';
+            c = 'white'
+
+            drawText(sign + Math.abs(i.v), i.x + 45, i.y--, 40, c)
+            if (i.y < i.o - 35) {
                 infoTextLocation = [];
                 playSpecial = 0
             };
