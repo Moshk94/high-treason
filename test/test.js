@@ -30,10 +30,10 @@ let movementSpeed = 5;
 class Piece {
     animateHP(s = 1) {
         if (this.newHP > this.currentHP && this.newHP <= this.maxHP) {
-            this.currentHP += s
+            this.currentHP += s;
         } else if (this.newHP < this.currentHP && this.newHP >= 0) {
-            this.currentHP -= s
-        }
+            this.currentHP -= s;
+        };
 
         this.currentHP <= 0 ? this.currentHP = 0 : 0;
         this.currentHP >= this.maxHP ? this.currentHP = this.maxHP : 0;
@@ -42,67 +42,69 @@ class Piece {
         this.newHP >= this.maxHP ? this.newHP = this.maxHP : 0;
     };
     animateMovement() {
-        if (this.newX < this.x) {
-            this.x -= movementSpeed
-        } else if (this.newX > this.x) {
-
-            this.x += movementSpeed
+        if (this.tempY == undefined) {
+            this.newX < this.x ? this.x -= movementSpeed : 0;
+            this.newX > this.x ? this.x += movementSpeed : 0;
+            this.newY > this.y ? this.y += movementSpeed : 0;
+            this.newY < this.y ? this.y -= movementSpeed : 0;
+        } else {
+            this.tempY < this.y ? this.y -= movementSpeed / 2 : 0;
+            this.tempY == this.y ? this.tempY = undefined : 0;
         }
-        if (this.newY < this.y) {
-            this.y -= movementSpeed
-        } else if (this.newY > this.y) {
 
-            this.y += movementSpeed
-        }
     };
     animateSpecial() {
-        this.y -= 35
+        this.tempY = this.y - 35
     }
     heal() {
         let healValue;
-        let piecesToHeal = [];
-        diagonals = [{ x: 50, y: -40 }, { x: 50, y: 40 }, { x: -50, y: 40 }, { x: -50, y: -40 }]
+        if (this.constructor.name == "Queen") {
+            healValue = 35
+        } else {
+            let piecesToHeal = [];
+            diagonals = [{ x: 50, y: -40 }, { x: 50, y: 40 }, { x: -50, y: 40 }, { x: -50, y: -40 }]
 
-        healValue = 20;
-        diagonals.forEach(d => {
-            d.x += this.x
-            d.y += this.y
+            healValue = 20;
+            diagonals.forEach(d => {
+                d.x += this.x
+                d.y += this.y
 
-            let c = playerPieces.findIndex(a => a.x === d.x && a.y === d.y && a.currentHP != a.maxHP)
-            if (c >= 0) {
-                piecesToHeal.push(c);
-                healValue /= 2;
-            }
-        });
+                let c = playerPieces.findIndex(a => a.x === d.x && a.y === d.y && a.currentHP != a.maxHP)
+                if (c >= 0) {
+                    piecesToHeal.push(c);
+                    healValue /= 2;
+                }
+            });
 
-        piecesToHeal.forEach(i => {
-            playerPieces[i].newHP += healValue;
-        });
+            piecesToHeal.forEach(i => {
+                playerPieces[i].newHP += healValue;
+            });
+        };
 
         this.newHP += healValue;
         this.animateSpecial();
     }
     buffAttack() {
-        diagonals = [{ x: 50, y: -40 }, { x: 50, y: 40 }, { x: -50, y: 40 }, { x: -50, y: -40 }];
+        if (this.constructor.name == "Pawn") {
+            diagonals = [{ x: 50, y: -40 }, { x: 50, y: 40 }, { x: -50, y: 40 }, { x: -50, y: -40 }];
 
-        diagonals.forEach(d => {
-            
-            d.x += this.x
-            d.y += this.y
+            diagonals.forEach(d => {
 
-            let c = playerPieces.findIndex(a => a.x === d.x && a.y === d.y)
-            if (c >= 0) {
-                console.log("")
-                playerPieces[c].attack += 10
-            }
-        });
+                d.x += this.x;
+                d.y += this.y;
+
+                let c = playerPieces.findIndex(a => a.x === d.x && a.y === d.y);
+                if (c >= 0) {
+                    playerPieces[c].attack += 10;
+                };
+            });
+        };
 
         this.attack += 10;
         this.animateSpecial();
 
     };
 };
-
 
 class Moves extends Piece {
     constructor(p) {
@@ -134,11 +136,11 @@ class Pawn extends Piece {
         this.currentHP = 1;
         this.maxHP = 100;
         this.attack = keycode == 51 ? 20 : 10;
-        this.newHP = 1; // this.maxHP;
+        this.newHP = this.maxHP;
         this.key = keycode;
         this.newX = this.x;
         this.newY = this.y;
-        this.ctxFilterString
+        this.ctxFilterString;
     };
     draw(x = this.x, y = this.y, w = 40, h = 60) {
         let deg;
@@ -156,7 +158,18 @@ class Pawn extends Piece {
         this.animateHP();
         this.animateMovement();
     };
-    attackPiece() { };
+    attackQueen() {
+        diagonals = [{ x: 50, y: -40 }, { x: 50, y: 40 }, { x: -50, y: 40 }, { x: -50, y: -40 }];
+        diagonals.every(d => {
+            d.x += this.x;
+            d.y += this.y;
+            if (queenPiece.x == d.x && queenPiece.y == d.y) {
+                queenPiece.newHP -= this.attack
+                return false;
+            } else { return true };
+        });
+        this.selected = 0
+    };
     findLegalMoves(p) {
         if (p == this.key) {
             playerPieces.forEach(p => { p.selected = 0 })
@@ -185,15 +198,64 @@ class Pawn extends Piece {
     };
 };
 
+class Queen extends Piece {
+    constructor() {
+        super();
+        this.x = 280
+        this.y = 180
+        this.currentHP = 1;
+        this.maxHP = 300;
+        this.attack = 30;
+        this.newHP = 300
+    };
+    draw() {
+        ctx.save();
+        ctx.filter = 'sepia(100%) saturate(500%) hue-rotate(2deg)';
+        ctx.drawImage(queenImg, this.x - 5, this.y - 20);
+        ctx.restore();
+        this.drawQueenInformationSection();
+        this.animateHP(5);
+
+    }
+    drawQueenInformationSection() {
+        ctx.fillStyle = "black";
+        ctx.fillRect(boardX, boardY - cellSize * 2, 350, 50);
+
+        ctx.fillStyle = "grey"
+        ctx.fillRect(boardX, boardY - cellSize * 2, 350, 20);
+
+        ctx.fillStyle = "darkgreen"
+        ctx.fillRect(boardX, boardY - cellSize * 2, 350 * (this.currentHP / this.maxHP), 20);
+
+        drawText(`${this.currentHP} / ${this.maxHP}`, boardX + 175, boardY - cellSize * 2 + 9, 25, 'white');
+
+        drawText(`Att: ${this.attack}`, boardX + 175, boardY - cellSize * 2 + 35, 25, 'white');
+
+        ctx.beginPath();
+        ctx.strokeStyle = 'darkred';
+        ctx.lineWidth = 5;
+        ctx.arc(boardX, boardY - cellSize * 2 + 25, 30, 0, 2 * PI);
+        ctx.stroke();
+        ctx.fillStyle = "black"
+        ctx.fill();
+
+        ctx.save();
+        ctx.filter = 'sepia(100%) saturate(500%) hue-rotate(2deg)';
+        ctx.drawImage(queenImg, boardX - 25, boardY - 130);
+        ctx.restore();
+    };
+};
+
+let queenPiece = new Queen();
 let availableMoves = [];
 export let playerPieces = [
     new Pawn(49, 3, 3),
-    new Pawn(50, 4, 4),
-    new Pawn(51, 2, 4),
+    new Pawn(50, 4, 1),
+    new Pawn(51, 2, 1),
 ];
 
 canvas.addEventListener('keydown', function (e) {
-    // console.log(e.keyCode);
+    console.log(e.keyCode);
     playerPieces.forEach(p => {
         if (p.selected) {
             let findD = availableMoves.findIndex(ee => ee.direction == e.keyCode);
@@ -220,6 +282,9 @@ canvas.addEventListener('keydown', function (e) {
                 playerPieces[1].buffAttack();
                 playerPieces[1].selected = 0;
             };
+            if (e.keyCode == 90) {
+                p.attackQueen();
+            };
             availableMoves = [];
         }
         p.findLegalMoves(e.keyCode);
@@ -231,7 +296,7 @@ setInterval(() => {
     drawDebuggerGrid();
     drawInformationSection();
     drawBoard();
-    allPiece = [...availableMoves, ...playerPieces].sort(function (a, b) { return a.y - b.y });
+    allPiece = [...availableMoves, ...playerPieces, queenPiece].sort(function (a, b) { return a.y - b.y });
 
     allPiece.forEach(e => {
         e.draw()

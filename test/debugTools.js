@@ -66,7 +66,7 @@ export function drawInformationSection() {
 
         drawText(`${playerPieces[i].currentHP} / ${playerPieces[i].maxHP}`,infoX + 75,boardY + cellSize * 7 - 16,25,'white');
 
-        drawText(`Att: ${playerPieces[i].attack}`,infoX + 75,boardY + cellSize * 7 + 10,25,'darkred');
+        drawText(`Att: ${playerPieces[i].attack}`,infoX + 75,boardY + cellSize * 7 + 10,25,'white');
 
         ctx.beginPath();
         ctx.strokeStyle = 'red';
