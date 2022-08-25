@@ -26,7 +26,7 @@ let playerTurn = 1;
 let allPiece;
 let dt = 1 / 60;
 let time = 0;
-let movementSpeed = 10;
+let movementSpeed = 5;
 class Piece {
     animateHP(s = 1) {
         if (this.newHP > this.currentHP && this.newHP <= this.maxHP) {
@@ -54,6 +54,9 @@ class Piece {
 
             this.y += movementSpeed
         }
+    };
+    animateSpecial() {
+        this.y -= 35
     }
     heal() {
         let healValue;
@@ -77,22 +80,25 @@ class Piece {
         });
 
         this.newHP += healValue;
+        this.animateSpecial();
     }
     buffAttack() {
-        
         diagonals = [{ x: 50, y: -40 }, { x: 50, y: 40 }, { x: -50, y: 40 }, { x: -50, y: -40 }];
 
         diagonals.forEach(d => {
+            
             d.x += this.x
             d.y += this.y
 
             let c = playerPieces.findIndex(a => a.x === d.x && a.y === d.y)
             if (c >= 0) {
+                console.log("")
                 playerPieces[c].attack += 10
             }
         });
 
-        this.attack +=10
+        this.attack += 10;
+        this.animateSpecial();
 
     };
 };
@@ -109,9 +115,9 @@ class Moves extends Piece {
     };
     draw() {
         let deg;
-        this.key == 49 ? deg = 50 : 0;
+        this.key == 49 ? deg = 65 : 0;
         this.key == 50 ? deg = -60 : 0;
-        this.key == 51 ? deg = 0 : 0;
+        this.key == 51 ? deg = 180 : 0;
         let ctxFilterString = `opacity(35%) sepia(100%) saturate(500%) hue-rotate(${deg}deg)`;
         ctx.save();
         ctx.filter = ctxFilterString;
@@ -127,8 +133,8 @@ class Pawn extends Piece {
         this.y = 180 + (40 * y)
         this.currentHP = 1;
         this.maxHP = 100;
-        this.attack = keycode == 51? 20:10;
-        this.newHP = 1;//this.maxHP;
+        this.attack = keycode == 51 ? 20 : 10;
+        this.newHP = 1; // this.maxHP;
         this.key = keycode;
         this.newX = this.x;
         this.newY = this.y;
@@ -137,9 +143,9 @@ class Pawn extends Piece {
     draw(x = this.x, y = this.y, w = 40, h = 60) {
         let deg;
 
-        this.key == 49 ? deg = 50 : 0;
+        this.key == 49 ? deg = 65 : 0;
         this.key == 50 ? deg = -60 : 0;
-        this.key == 51 ? deg = 0 : 0;
+        this.key == 51 ? deg = 180 : 0;
 
 
         this.ctxFilterString = `sepia(100%) saturate(500%) hue-rotate(${deg}deg)`;
@@ -162,18 +168,18 @@ class Pawn extends Piece {
             let checkSouth = playerPieces.some(el => el.y === this.y + 40 && this.x === el.x);
 
             if (this.x - 50 >= 130 && !checkWest) {
-                availableMoves.push(new Moves({k:this.key, x: this.x - 50, y: this.y, d: 37 }))
+                availableMoves.push(new Moves({ k: this.key, x: this.x - 50, y: this.y, d: 37 }))
             }
             if (this.x + 50 < 480 && !checkEast) {
-                availableMoves.push(new Moves({k:this.key, x: this.x + 50, y: this.y, d: 39 }))
+                availableMoves.push(new Moves({ k: this.key, x: this.x + 50, y: this.y, d: 39 }))
             }
 
             if (this.y - 40 >= 180 && !checkNorth) {
-                availableMoves.push(new Moves({k:this.key, x: this.x, y: this.y - 40, d: 38 }))
+                availableMoves.push(new Moves({ k: this.key, x: this.x, y: this.y - 40, d: 38 }))
             }
 
             if (this.y + 40 < 460 && !checkSouth) {
-                availableMoves.push(new Moves({k:this.key, x: this.x, y: this.y + 40, d: 40 }))
+                availableMoves.push(new Moves({ k: this.key, x: this.x, y: this.y + 40, d: 40 }))
             }
         };
     };
