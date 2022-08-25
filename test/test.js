@@ -13,6 +13,9 @@ export const PI = Math.PI;
 
 const pawnImg = new Image();
 const queenImg = new Image();
+const heartImg = new Image();
+
+heartImg.src = 'h.png'
 queenImg.src = 'q.png'
 pawnImg.src = 'p.png';
 let infoTextLocation = [];
@@ -327,10 +330,11 @@ function drawInfoText() {
             let sign = i.v >= 0 ? '+' : '-';
             c = 'white'
 
-            drawText(sign + Math.abs(i.v), i.x + 45, i.y--, 40, c)
+            ctx.save();
+            ctx.drawImage(heartImg, i.x, i.y--,20,20);
+            ctx.restore();
+            drawText(sign + Math.abs(i.v), i.x + 50, (i.y+9), 40, c)
             if (i.y < i.o - 35) {
-                infoTextLocation = [];
-                playSpecial = 0
             };
         });
     };
