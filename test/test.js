@@ -184,8 +184,9 @@ class Pawn extends Piece {
             if (queenPiece.x == d.x && queenPiece.y == d.y) {
                 this.x -= ((this.x - queenPiece.x) / 2)
                 this.y -= ((this.y - queenPiece.y) / 2)
-                infoTextLocation.push({ x: queenPiece.x, y: queenPiece.y, v: (-this.attack), o: queenPiece.y, t: 'h' })
                 queenPiece.newHP -= this.attack
+                infoTextLocation.push({ x: queenPiece.x, y: queenPiece.y, v: (-this.attack), o: queenPiece.y, t: 'h' });
+                playSpecial = 1
                 return false;
             } else { return true };
         });
