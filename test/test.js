@@ -228,7 +228,7 @@ class Queen extends Piece {
         this.currentHP = 1;
         this.maxHP = 300;
         this.attack = 30;
-        this.newHP = 300
+        this.newHP = this.maxHP
     };
     draw() {
         ctx.save();
@@ -266,6 +266,11 @@ class Queen extends Piece {
         ctx.drawImage(queenImg, boardX - 25, boardY - 130);
         ctx.restore();
     };
+    findLegalMoves(){
+        let surroundingSquares = [
+
+        ]
+    }
 };
 
 let queenPiece = new Queen();
