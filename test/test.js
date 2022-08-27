@@ -136,9 +136,9 @@ class Moves extends Piece {
     };
     draw() {
         let deg;
-        this.key == 49 ? deg = 65 : 0;
-        this.key == 50 ? deg = -60 : 0;
-        this.key == 51 ? deg = 180 : 0;
+        this.key == 1 ? deg = 65 : 0;
+        this.key == 2 ? deg = -60 : 0;
+        this.key == 3 ? deg = 180 : 0;
         let ctxFilterString = `opacity(35%) sepia(100%) saturate(500%) hue-rotate(${deg}deg)`;
         ctx.save();
         ctx.filter = ctxFilterString;
@@ -154,7 +154,7 @@ class Pawn extends Piece {
         this.y = 180 + (40 * y)
         this.currentHP = 1;
         this.maxHP = 100;
-        this.attack = keycode == 51 ? 20 : 10;
+        this.attack = keycode == 3 ? 20 : 10;
         this.newHP = this.maxHP;
         this.key = keycode;
         this.newX = this.x;
@@ -164,9 +164,9 @@ class Pawn extends Piece {
     draw(x = this.x, y = this.y, w = 40, h = 60) {
         let deg;
 
-        this.key == 49 ? deg = 65 : 0;
-        this.key == 50 ? deg = -60 : 0;
-        this.key == 51 ? deg = 180 : 0;
+        this.key == 1 ? deg = 65 : 0;
+        this.key == 2 ? deg = -60 : 0;
+        this.key == 3 ? deg = 180 : 0;
 
         this.ctxFilterString = `sepia(100%) saturate(500%) hue-rotate(${deg}deg)`;
         ctx.save();
@@ -203,18 +203,18 @@ class Pawn extends Piece {
             let checkSouth = playerPieces.some(el => el.y === this.y + 40 && this.x === el.x) || queenPiece.y === this.y + 40 && this.x === queenPiece.x;;
 
             if (this.x - 50 >= 130 && !checkWest) {
-                availableMoves.push(new Moves({ k: this.key, x: this.x - 50, y: this.y, d: 37 }))
+                availableMoves.push(new Moves({ k: this.key, x: this.x - 50, y: this.y, d: 'ArrowLeft' }))
             }
             if (this.x + 50 < 480 && !checkEast) {
-                availableMoves.push(new Moves({ k: this.key, x: this.x + 50, y: this.y, d: 39 }))
+                availableMoves.push(new Moves({ k: this.key, x: this.x + 50, y: this.y, d: 'ArrowRight' }))
             }
 
             if (this.y - 40 >= 180 && !checkNorth) {
-                availableMoves.push(new Moves({ k: this.key, x: this.x, y: this.y - 40, d: 38 }))
+                availableMoves.push(new Moves({ k: this.key, x: this.x, y: this.y - 40, d: 'ArrowUp' }))
             }
 
             if (this.y + 40 < 460 && !checkSouth) {
-                availableMoves.push(new Moves({ k: this.key, x: this.x, y: this.y + 40, d: 40 }))
+                availableMoves.push(new Moves({ k: this.key, x: this.x, y: this.y + 40, d: 'ArrowDown' }))
             }
         };
     };
@@ -271,45 +271,45 @@ class Queen extends Piece {
 let queenPiece = new Queen();
 let availableMoves = [];
 export let playerPieces = [
-    new Pawn(49, 3, 2),
-    new Pawn(50, 4, 1),
-    new Pawn(51, 2, 1),
+    new Pawn(1, 3, 2),
+    new Pawn(2, 4, 1),
+    new Pawn(3, 2, 1),
 ];
 
 canvas.addEventListener('keydown', function (e) {
-    // console.log(e.keyCode);
+    console.log(`${e.keyCode}: ${e.key}`);
     playerPieces.forEach(p => {
         if (p.selected) {
-            let findD = availableMoves.findIndex(ee => ee.direction == e.keyCode);
+            let findD = availableMoves.findIndex(ee => ee.direction == e.key);
             if (findD >= 0) {
-                if (e.keyCode == 38) {
+                if (e.key == 'ArrowUp') {
                     p.newY -= 40;
                 }
-                if (e.keyCode == 37) {
+                if (e.key == 'ArrowLeft') {
                     p.newX -= 50;
                 }
-                if (e.keyCode == 39) {
+                if (e.key == 'ArrowRight') {
                     p.newX += 50;
                 }
-                if (e.keyCode == 40) {
+                if (e.key == 'ArrowDown') {
                     p.newY += 40;
                 }
                 p.selected = 0;
             }
-            if (e.keyCode == 88 && playerPieces[0].selected) {
+            if (e.key == 'x' && playerPieces[0].selected) {
                 playerPieces[0].heal();
                 playerPieces[0].selected = 0;
             };
-            if (e.keyCode == 88 && playerPieces[1].selected) {
+            if (e.key == 'x' && playerPieces[1].selected) {
                 playerPieces[1].buffAttack();
                 playerPieces[1].selected = 0;
             };
-            if (e.keyCode == 90) {
+            if (e.key == 'z') {
                 p.attackQueen();
             };
             availableMoves = [];
         }
-        p.findLegalMoves(e.keyCode);
+        p.findLegalMoves(e.key);
     });
 });
 
