@@ -73,7 +73,7 @@ class Piece {
         let healValue;
         if (this.constructor.name == "Queen") {
             healValue = 35;
-            infoTextLocation.push({ x: this.x, y: this.y, v: healValue, o: this.y, t:'h' })
+            infoTextLocation.push({ x: this.x, y: this.y, v: healValue, o: this.y, t: 'h' })
         } else {
             let piecesToHeal = [];
             diagonals = [{ x: 50, y: -40 }, { x: 50, y: 40 }, { x: -50, y: 40 }, { x: -50, y: -40 }]
@@ -92,17 +92,17 @@ class Piece {
 
             piecesToHeal.forEach(i => {
                 playerPieces[i].newHP += healValue;
-                infoTextLocation.push({ x: playerPieces[i].x, y: playerPieces[i].y, v: healValue, o: playerPieces[i].y, t:'h' })
+                infoTextLocation.push({ x: playerPieces[i].x, y: playerPieces[i].y, v: healValue, o: playerPieces[i].y, t: 'h' })
             });
         };
-        infoTextLocation.push({ x: this.x, y: this.y, v: healValue, o: this.y, t:'h' })
+        infoTextLocation.push({ x: this.x, y: this.y, v: healValue, o: this.y, t: 'h' })
         this.newHP += healValue;
         this.animateSpecial();
     }
     buffAttack() {
         let attackBuffValue = 10;
         if (this.constructor.name == "Pawn") {
-            attackBuffValue /=2
+            attackBuffValue /= 2
             diagonals = [{ x: 50, y: -40 }, { x: 50, y: 40 }, { x: -50, y: 40 }, { x: -50, y: -40 }];
 
             diagonals.forEach(d => {
@@ -113,12 +113,12 @@ class Piece {
                 let c = playerPieces.findIndex(a => a.x === d.x && a.y === d.y);
                 if (c >= 0) {
                     playerPieces[c].attack += 10;
-                    infoTextLocation.push({ x: playerPieces[c].x, y: playerPieces[c].y, v: attackBuffValue*2, o: playerPieces[c].y, t:'a' })
+                    infoTextLocation.push({ x: playerPieces[c].x, y: playerPieces[c].y, v: attackBuffValue * 2, o: playerPieces[c].y, t: 'a' })
                 };
             });
         };
 
-        infoTextLocation.push({ x: this.x, y: this.y, v: attackBuffValue, o: this.y, t:'a' })
+        infoTextLocation.push({ x: this.x, y: this.y, v: attackBuffValue, o: this.y, t: 'a' })
         this.attack += attackBuffValue;
         this.animateSpecial();
 
@@ -182,9 +182,9 @@ class Pawn extends Piece {
             d.x += this.x;
             d.y += this.y;
             if (queenPiece.x == d.x && queenPiece.y == d.y) {
-                this.x -= ((this.x-queenPiece.x)/2)
-                this.y -= ((this.y-queenPiece.y)/2)
-                infoTextLocation.push({ x: queenPiece.x, y: queenPiece.y, v: (-this.attack), o: queenPiece.y, t:'h' })
+                this.x -= ((this.x - queenPiece.x) / 2)
+                this.y -= ((this.y - queenPiece.y) / 2)
+                infoTextLocation.push({ x: queenPiece.x, y: queenPiece.y, v: (-this.attack), o: queenPiece.y, t: 'h' })
                 queenPiece.newHP -= this.attack
                 return false;
             } else { return true };
@@ -196,10 +196,10 @@ class Pawn extends Piece {
             playerPieces.forEach(p => { p.selected = 0 })
             availableMoves = [];
             this.selected = 1;
-            let checkEast = playerPieces.some(el => el.x === this.x + 50 && this.y === el.y);
-            let checkWest = playerPieces.some(el => el.x === this.x - 50 && this.y === el.y);
-            let checkNorth = playerPieces.some(el => el.y === this.y - 40 && this.x === el.x);
-            let checkSouth = playerPieces.some(el => el.y === this.y + 40 && this.x === el.x);
+            let checkEast = playerPieces.some(el => el.x === this.x + 50 && this.y === el.y) || queenPiece.y === this.y && this.x + 50 === queenPiece.x;;
+            let checkWest = playerPieces.some(el => el.x === this.x - 50 && this.y === el.y) || queenPiece.y === this.y && this.x - 50 === queenPiece.x;
+            let checkNorth = playerPieces.some(el => el.y === this.y - 40 && this.x === el.x) || queenPiece.y === this.y - 40 && this.x === queenPiece.x;
+            let checkSouth = playerPieces.some(el => el.y === this.y + 40 && this.x === el.x) || queenPiece.y === this.y + 40 && this.x === queenPiece.x;;
 
             if (this.x - 50 >= 130 && !checkWest) {
                 availableMoves.push(new Moves({ k: this.key, x: this.x - 50, y: this.y, d: 37 }))
@@ -223,7 +223,7 @@ class Queen extends Piece {
     constructor() {
         super();
         this.x = 280
-        this.y = 180
+        this.y = 220
         this.currentHP = 1;
         this.maxHP = 300;
         this.attack = 30;
@@ -340,14 +340,14 @@ function drawInfoText() {
             let sign = i.v >= 0 ? '+' : '-';
 
             ctx.save();
-            if(i.t == 'h'){
+            if (i.t == 'h') {
 
-                ctx.drawImage(heartImg, i.x, i.y--,20,20);
-            } else if(i.t == 'a'){
-                ctx.drawImage(swordImg, i.x, i.y--,20,20);
+                ctx.drawImage(heartImg, i.x, i.y--, 20, 20);
+            } else if (i.t == 'a') {
+                ctx.drawImage(swordImg, i.x, i.y--, 20, 20);
             }
             ctx.restore();
-            drawText(sign + Math.abs(i.v), i.x + 50, (i.y+9), 40, 'white')
+            drawText(sign + Math.abs(i.v), i.x + 50, (i.y + 9), 40, 'white')
             if (i.y < i.o - 35) {
                 infoTextLocation = [];
                 playSpecial = 0
