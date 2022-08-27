@@ -3,6 +3,8 @@
 // INFO +/- 40 to move along the y axis
 
 import { drawDebuggerGrid, drawText, drawBoard, drawInformationSection } from "./debugTools";
+import pawnSrc from "../src/p.png"
+
 
 export const ctx = document.getElementById('canvas').getContext("2d");
 export const boardX = 125;
@@ -18,7 +20,7 @@ export const swordImg = new Image();
 
 heartImg.src = 'h.png'
 queenImg.src = 'q.png'
-pawnImg.src = 'p.png';
+pawnImg.src = pawnSrc;
 swordImg.src = 's.png';
 let infoTextLocation = [];
 let playSpecial = 0;
@@ -180,6 +182,8 @@ class Pawn extends Piece {
             d.x += this.x;
             d.y += this.y;
             if (queenPiece.x == d.x && queenPiece.y == d.y) {
+                this.x -= ((this.x-queenPiece.x)/2)
+                this.y -= ((this.y-queenPiece.y)/2)
                 queenPiece.newHP -= this.attack
                 return false;
             } else { return true };
@@ -226,7 +230,7 @@ class Queen extends Piece {
     };
     draw() {
         ctx.save();
-        ctx.filter = 'sepia(100%) saturate(500%) hue-rotate(2deg)';
+        ctx.filter = 'brightness(50%)';
         ctx.drawImage(queenImg, this.x - 5, this.y - 20);
         ctx.restore();
         this.drawQueenInformationSection();
@@ -256,7 +260,7 @@ class Queen extends Piece {
         ctx.fill();
 
         ctx.save();
-        ctx.filter = 'sepia(100%) saturate(500%) hue-rotate(2deg)';
+        ctx.filter = 'brightness(50%)';
         ctx.drawImage(queenImg, boardX - 25, boardY - 130);
         ctx.restore();
     };
