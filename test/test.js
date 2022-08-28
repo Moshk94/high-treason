@@ -65,8 +65,8 @@ class Piece {
                 this.tempY = undefined;
             };
         };
-        if (time > 1 && !playerTurn){
-            time = 0;
+        if (time > 1 && !playerTurn) {
+            time = 0.5;
             queenPiece.takeTurn();
         }
     };
@@ -197,7 +197,7 @@ class Pawn extends Piece {
             if (queenPiece.x == d.x && queenPiece.y == d.y) {
                 this.attackAnimation(queenPiece.x, queenPiece.y, this.attack);
                 queenPiece.newHP -= this.attack
-  
+
 
                 endPlayerTurn();
                 return false;
@@ -240,8 +240,8 @@ class Queen extends Piece {
         this.y = 180 + 40
         this.currentHP = 1;
         this.maxHP = 300;
-        this.attack = 300;
-        this.newHP = 1 //this.maxHP
+        this.attack = 30;
+        this.newHP = this.maxHP
         this.type = 'Q'
         this.newY = this.y;
         this.newX = this.x;
@@ -284,7 +284,7 @@ class Queen extends Piece {
         ctx.restore();
     };
     takeTurn() {
-        if(this.newHP < Math.max(...playerPieces.map(o => o.attack)) && this.newHP != this.maxHP){
+        if (this.newHP <= Math.max(...playerPieces.map(o => o.attack)) && this.newHP != this.maxHP) {
             this.heal();
         } else {
             let enemyInRange = [];
@@ -300,29 +300,37 @@ class Queen extends Piece {
                 { x: 50, y: 40 }, // SE
             ];
 
-            sq.every(e =>{
-                let findD = playerPieces.findIndex(f => f.newY == this.y + e.y && f.newX == this.x + e.x);
+            sq.every(e => {
+                let findD = playerPieces.findIndex(f => f.newY == this.y + e.y && f.newX == this.x + e.x && f.newHP > 0);
                 if (findD >= 0) {
                     enemyInRange.push(findD);
                     enemyCount++
-                    enemyCount >= 3 ? false: true;
+                    enemyCount >= 3 ? false : true;
                 }
                 return true;
             })
-
-           
-            if(enemyInRange.length > 0){
+            
+            if (enemyInRange.length > 0) {
                 let lowestHealth = Infinity;
-                enemyInRange.every(e=>{
-                    if(playerPieces[e].newHP < lowestHealth){
-                        if(playerPieces[e].newHP < this.attack){
-                            playerPieces[e].newHP -= this.attack
-                            this.attackAnimation(playerPieces[e].newX, playerPieces[e].newY, this.attack)
+                let pos = -1;
+                enemyInRange.every(e => {
+                    if (playerPieces[e].newHP < lowestHealth) {
+                        if (playerPieces[e].newHP < this.attack) {
+                            pos = e;
                             return false;
+                        } else {
+                            pos = e;
+                            return true;
                         }
                     }
-                })
+                });
+                playerPieces[pos].newHP -= this.attack
+                this.attackAnimation(playerPieces[pos].newX, playerPieces[pos].newY, this.attack);
+            } else {
+                
             }
+
+
         };
         playerTurn = 1;
     };
@@ -331,9 +339,9 @@ class Queen extends Piece {
 let queenPiece = new Queen();
 let availableMoves = [];
 export let playerPieces = [
-    new Pawn(1, 3, 2),
-    new Pawn(2, 5, 1),
-    new Pawn(3, 2, 1),
+    new Pawn(1, 3, 5),
+    // new Pawn(2, 5, 1),
+    // new Pawn(3, 2, 1),
 ];
 
 canvas.addEventListener('keydown', function (e) {
@@ -375,9 +383,9 @@ canvas.addEventListener('keydown', function (e) {
                     p.attackQueen();
                 };
             }
-            
+
             p.findLegalMoves(e.key);
-            
+
             // availableMoves = [];
         }
     });
@@ -411,13 +419,14 @@ function drawInfoText() {
             let sign = i.v >= 0 ? '+' : '-';
 
             ctx.save();
+            let newX = i.x ;
             if (i.t == 'h') {
-                ctx.drawImage(heartImg, i.x + 75 - ctx.measureText(Math.abs(i.v)).width*4.5, -7.2 + i.y--, 20, 20);
+                ctx.drawImage(heartImg, newX, -7.2 + i.y--, 20, 20);
+                drawText(sign + Math.abs(i.v), newX + 60, (i.y), 40, 'white')
             } else if (i.t == 'a') {
-                ctx.drawImage(swordImg, i.x, i.y--, 20, 20);
+                ctx.drawImage(swordImg, newX, i.y--, 20, 20);
             }
             ctx.restore();
-            drawText(sign + Math.abs(i.v), i.x + 75, (i.y), 40, 'white')
             if (i.y < i.o - 50) {
                 infoTextLocation = [];
                 playSpecial = 0
