@@ -123,6 +123,10 @@ class Piece {
         this.animateSpecial();
 
     };
+    attackAnimation(x,y){
+        this.x -= ((this.x-x)/2);
+        this.y -= ((this.y-y)/2);
+    }
 };
 
 class Moves extends Piece {
@@ -182,8 +186,7 @@ class Pawn extends Piece {
             d.x += this.x;
             d.y += this.y;
             if (queenPiece.x == d.x && queenPiece.y == d.y) {
-                this.x -= ((this.x - queenPiece.x) / 2)
-                this.y -= ((this.y - queenPiece.y) / 2)
+                this.attackAnimation(queenPiece.x, queenPiece.y);
                 queenPiece.newHP -= this.attack
                 infoTextLocation.push({ x: queenPiece.x, y: queenPiece.y, v: (-this.attack), o: queenPiece.y, t: 'h' });
                 playSpecial = 1
@@ -224,7 +227,7 @@ class Queen extends Piece {
     constructor() {
         super();
         this.x = 280
-        this.y = 220
+        this.y = 180
         this.currentHP = 1;
         this.maxHP = 300;
         this.attack = 30;
@@ -266,11 +269,29 @@ class Queen extends Piece {
         ctx.drawImage(queenImg, boardX - 25, boardY - 130);
         ctx.restore();
     };
-    findLegalMoves(){
-        let surroundingSquares = [
+    findLegalMoves() {
+        let legalMoves = []
+        let sq = [
+            { x: 0, y: 40 }, // South
+            { x: 0, y: -40 }, // Nouth
+            { x: 50, y: -40 }, // NE
+            { x: -50, y: -40 }, // NW
+            { x: -50, y: 40 },// SW
+            { x: -50, y: 0 },// W
+            { x: 50, y: 0 },// E
+            { x: 50, y: 40 }, // SE
+        ];
 
-        ]
-    }
+        for(let i = 0; i < sq.length; i++){
+            if(this.x + sq[i].x >=130 &&
+                this.x + sq[i].x < 480 &&
+                this.y + sq[i].y >= 180 &&
+                this.y + sq[i].y < 460){
+                    legalMoves.push(sq[i])
+                }
+        };
+        console.log(allPiece)
+    };
 };
 
 let queenPiece = new Queen();
@@ -283,6 +304,9 @@ export let playerPieces = [
 
 canvas.addEventListener('keydown', function (e) {
     console.log(`${e.keyCode}: ${e.key}`);
+    if(e.key == ' '){
+        queenPiece.findLegalMoves();
+    }
     playerPieces.forEach(p => {
         if (p.selected) {
             let findD = availableMoves.findIndex(ee => ee.direction == e.key);
