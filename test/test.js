@@ -186,6 +186,7 @@ class Pawn extends Piece {
         ctx.restore();
         this.animateHP();
         this.animateMovement();
+        this.updateScore();
     };
     attackQueen() {
         diagonals = [{ x: 50, y: -40 }, { x: 50, y: 40 }, { x: -50, y: 40 }, { x: -50, y: -40 }];
@@ -235,10 +236,10 @@ class Queen extends Piece {
         super();
         this.x = 280
         this.y = 180
-        this.currentHP = 1;
+        this.currentHP = 20;
         this.maxHP = 300;
         this.attack = 30;
-        this.newHP = this.maxHP
+        this.newHP = 20 //this.maxHP
     };
     draw() {
         ctx.save();
@@ -247,6 +248,7 @@ class Queen extends Piece {
         ctx.restore();
         this.drawQueenInformationSection();
         this.animateHP(5);
+        this.updateScore();
 
     }
     drawQueenInformationSection() {
@@ -305,12 +307,12 @@ let queenPiece = new Queen();
 let availableMoves = [];
 export let playerPieces = [
     new Pawn(1, 3, 2),
-    new Pawn(2, 4, 1),
-    new Pawn(3, 2, 1),
+    // new Pawn(2, 4, 1),
+    // new Pawn(3, 2, 1),
 ];
 
 canvas.addEventListener('keydown', function (e) {
-    console.log(`${e.keyCode}: ${e.key}`);
+    // console.log(`${e.keyCode}: ${e.key}`);
     if (e.key == ' ') {
         queenPiece.findLegalMoves();
     }
