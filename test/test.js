@@ -123,9 +123,16 @@ class Piece {
         this.animateSpecial();
 
     };
-    attackAnimation(x,y){
-        this.x -= ((this.x-x)/2);
-        this.y -= ((this.y-y)/2);
+    attackAnimation(x, y) {
+        this.x -= ((this.x - x) / 2);
+        this.y -= ((this.y - y) / 2);
+    };
+    updateScore() {
+        if(this.currentHP > 0){
+            this.score = this.currentHP + this.attack;
+        } else {
+            this.score = 0;
+        }
     }
 };
 
@@ -282,13 +289,13 @@ class Queen extends Piece {
             { x: 50, y: 40 }, // SE
         ];
 
-        for(let i = 0; i < sq.length; i++){
-            if(this.x + sq[i].x >=130 &&
+        for (let i = 0; i < sq.length; i++) {
+            if (this.x + sq[i].x >= 130 &&
                 this.x + sq[i].x < 480 &&
                 this.y + sq[i].y >= 180 &&
-                this.y + sq[i].y < 460){
-                    legalMoves.push(sq[i])
-                }
+                this.y + sq[i].y < 460) {
+                legalMoves.push(sq[i])
+            }
         };
         console.log(allPiece)
     };
@@ -304,7 +311,7 @@ export let playerPieces = [
 
 canvas.addEventListener('keydown', function (e) {
     console.log(`${e.keyCode}: ${e.key}`);
-    if(e.key == ' '){
+    if (e.key == ' ') {
         queenPiece.findLegalMoves();
     }
     playerPieces.forEach(p => {
