@@ -65,13 +65,19 @@ class Piece {
                 this.tempY = undefined;
             };
         };
+        if (time > 1 && !playerTurn){
+            time = 0;
+            queenPiece.takeTurn();
+        }
     };
     animateSpecial() {
         this.tempY = this.y - 35
+
     };
     heal() {
         let healValue;
         if (this.constructor.name == "Queen") {
+            this.animateSpecial();
             healValue = 35;
             infoTextLocation.push({ x: this.x, y: this.y, v: healValue, o: this.y, t: 'h' })
         } else {
@@ -123,17 +129,12 @@ class Piece {
         this.animateSpecial();
 
     };
-    attackAnimation(x, y) {
+    attackAnimation(x, y, a) {
         this.x -= ((this.x - x) / 2);
         this.y -= ((this.y - y) / 2);
+        infoTextLocation.push({ x: x, y: y, v: -a, o: y, t: 'h' });
+        playSpecial = 1
     };
-    updateScore() {
-        if(this.currentHP > 0){
-            this.score = this.currentHP + this.attack;
-        } else {
-            this.score = 0;
-        }
-    }
 };
 
 class Moves extends Piece {
@@ -171,6 +172,7 @@ class Pawn extends Piece {
         this.newX = this.x;
         this.newY = this.y;
         this.ctxFilterString;
+        this.type = "P"
     };
     draw(x = this.x, y = this.y, w = 40, h = 60) {
         let deg;
@@ -186,7 +188,6 @@ class Pawn extends Piece {
         ctx.restore();
         this.animateHP();
         this.animateMovement();
-        this.updateScore();
     };
     attackQueen() {
         diagonals = [{ x: 50, y: -40 }, { x: 50, y: 40 }, { x: -50, y: 40 }, { x: -50, y: -40 }];
@@ -194,10 +195,11 @@ class Pawn extends Piece {
             d.x += this.x;
             d.y += this.y;
             if (queenPiece.x == d.x && queenPiece.y == d.y) {
-                this.attackAnimation(queenPiece.x, queenPiece.y);
+                this.attackAnimation(queenPiece.x, queenPiece.y, this.attack);
                 queenPiece.newHP -= this.attack
-                infoTextLocation.push({ x: queenPiece.x, y: queenPiece.y, v: (-this.attack), o: queenPiece.y, t: 'h' });
-                playSpecial = 1
+  
+
+                endPlayerTurn();
                 return false;
             } else { return true };
         });
@@ -234,12 +236,16 @@ class Pawn extends Piece {
 class Queen extends Piece {
     constructor() {
         super();
-        this.x = 280
-        this.y = 180
-        this.currentHP = 20;
+        this.x = 280 + 50
+        this.y = 180 + 40
+        this.currentHP = 1;
         this.maxHP = 300;
-        this.attack = 30;
-        this.newHP = 20 //this.maxHP
+        this.attack = 300;
+        this.newHP = 1 //this.maxHP
+        this.type = 'Q'
+        this.newY = this.y;
+        this.newX = this.x;
+
     };
     draw() {
         ctx.save();
@@ -248,8 +254,7 @@ class Queen extends Piece {
         ctx.restore();
         this.drawQueenInformationSection();
         this.animateHP(5);
-        this.updateScore();
-
+        this.animateMovement()
     }
     drawQueenInformationSection() {
         ctx.fillStyle = "black";
@@ -278,28 +283,48 @@ class Queen extends Piece {
         ctx.drawImage(queenImg, boardX - 25, boardY - 130);
         ctx.restore();
     };
-    findLegalMoves() {
-        let legalMoves = []
-        let sq = [
-            { x: 0, y: 40 }, // South
-            { x: 0, y: -40 }, // Nouth
-            { x: 50, y: -40 }, // NE
-            { x: -50, y: -40 }, // NW
-            { x: -50, y: 40 },// SW
-            { x: -50, y: 0 },// W
-            { x: 50, y: 0 },// E
-            { x: 50, y: 40 }, // SE
-        ];
+    takeTurn() {
+        if(this.newHP < Math.max(...playerPieces.map(o => o.attack)) && this.newHP != this.maxHP){
+            this.heal();
+        } else {
+            let enemyInRange = [];
+            let enemyCount = 0;
+            let sq = [
+                { x: 0, y: 40 }, // South
+                { x: 0, y: -40 }, // Nouth
+                { x: 50, y: -40 }, // NE
+                { x: -50, y: -40 }, // NW
+                { x: -50, y: 40 },// SW
+                { x: -50, y: 0 },// W
+                { x: 50, y: 0 },// E
+                { x: 50, y: 40 }, // SE
+            ];
 
-        for (let i = 0; i < sq.length; i++) {
-            if (this.x + sq[i].x >= 130 &&
-                this.x + sq[i].x < 480 &&
-                this.y + sq[i].y >= 180 &&
-                this.y + sq[i].y < 460) {
-                legalMoves.push(sq[i])
+            sq.every(e =>{
+                let findD = playerPieces.findIndex(f => f.newY == this.y + e.y && f.newX == this.x + e.x);
+                if (findD >= 0) {
+                    enemyInRange.push(findD);
+                    enemyCount++
+                    enemyCount >= 3 ? false: true;
+                }
+                return true;
+            })
+
+           
+            if(enemyInRange.length > 0){
+                let lowestHealth = Infinity;
+                enemyInRange.every(e=>{
+                    if(playerPieces[e].newHP < lowestHealth){
+                        if(playerPieces[e].newHP < this.attack){
+                            playerPieces[e].newHP -= this.attack
+                            this.attackAnimation(playerPieces[e].newX, playerPieces[e].newY, this.attack)
+                            return false;
+                        }
+                    }
+                })
             }
         };
-        console.log(allPiece)
+        playerTurn = 1;
     };
 };
 
@@ -307,47 +332,54 @@ let queenPiece = new Queen();
 let availableMoves = [];
 export let playerPieces = [
     new Pawn(1, 3, 2),
-    // new Pawn(2, 4, 1),
-    // new Pawn(3, 2, 1),
+    new Pawn(2, 5, 1),
+    new Pawn(3, 2, 1),
 ];
 
 canvas.addEventListener('keydown', function (e) {
     // console.log(`${e.keyCode}: ${e.key}`);
     if (e.key == ' ') {
-        queenPiece.findLegalMoves();
+        (console.log(queenPiece.findLegalMoves()))
     }
     playerPieces.forEach(p => {
-        if (p.selected) {
-            let findD = availableMoves.findIndex(ee => ee.direction == e.key);
-            if (findD >= 0) {
-                if (e.key == 'ArrowUp') {
-                    p.newY -= 40;
+        if (playerTurn) {
+            if (p.selected) {
+                let findD = availableMoves.findIndex(ee => ee.direction == e.key);
+                if (findD >= 0) {
+                    if (e.key == 'ArrowUp') {
+                        p.newY -= 40;
+                    }
+                    if (e.key == 'ArrowLeft') {
+                        p.newX -= 50;
+                    }
+                    if (e.key == 'ArrowRight') {
+                        p.newX += 50;
+                    }
+                    if (e.key == 'ArrowDown') {
+                        p.newY += 40;
+                    }
+                    p.selected = 0;
+                    endPlayerTurn();
                 }
-                if (e.key == 'ArrowLeft') {
-                    p.newX -= 50;
-                }
-                if (e.key == 'ArrowRight') {
-                    p.newX += 50;
-                }
-                if (e.key == 'ArrowDown') {
-                    p.newY += 40;
-                }
-                p.selected = 0;
+                if (e.key == 'x' && playerPieces[0].selected) {
+                    playerPieces[0].heal();
+                    playerPieces[0].selected = 0;
+                    endPlayerTurn();
+                };
+                if (e.key == 'x' && playerPieces[1].selected) {
+                    playerPieces[1].buffAttack();
+                    playerPieces[1].selected = 0;
+                    endPlayerTurn();
+                };
+                if (e.key == 'z') {
+                    p.attackQueen();
+                };
             }
-            if (e.key == 'x' && playerPieces[0].selected) {
-                playerPieces[0].heal();
-                playerPieces[0].selected = 0;
-            };
-            if (e.key == 'x' && playerPieces[1].selected) {
-                playerPieces[1].buffAttack();
-                playerPieces[1].selected = 0;
-            };
-            if (e.key == 'z') {
-                p.attackQueen();
-            };
-            availableMoves = [];
+            
+            p.findLegalMoves(e.key);
+            
+            // availableMoves = [];
         }
-        p.findLegalMoves(e.key);
     });
 });
 
@@ -380,17 +412,23 @@ function drawInfoText() {
 
             ctx.save();
             if (i.t == 'h') {
-
-                ctx.drawImage(heartImg, i.x, i.y--, 20, 20);
+                ctx.drawImage(heartImg, i.x + 75 - ctx.measureText(Math.abs(i.v)).width*4.5, -7.2 + i.y--, 20, 20);
             } else if (i.t == 'a') {
                 ctx.drawImage(swordImg, i.x, i.y--, 20, 20);
             }
             ctx.restore();
-            drawText(sign + Math.abs(i.v), i.x + 50, (i.y + 9), 40, 'white')
-            if (i.y < i.o - 35) {
+            drawText(sign + Math.abs(i.v), i.x + 75, (i.y), 40, 'white')
+            if (i.y < i.o - 50) {
                 infoTextLocation = [];
                 playSpecial = 0
             };
         });
     };
 };
+
+
+function endPlayerTurn() {
+    availableMoves = [];
+    playerTurn = 0;
+    time = 0;
+}
