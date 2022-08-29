@@ -1,7 +1,7 @@
 import { drawTitlePage, changeSelection } from './titlepage.js'
 import { gamePhase, screenFade } from './transitions.js'
 import { drawHelpPlayer, drawHelpEnemy } from './helpPage.js'
-import { pauseScreen } from './playsScreen.js';
+import { pauseScreen, changePauseSelection } from './playsScreen.js';
 import { changeTransitionTo } from "./transitions";
 import { DrawTextWithLink } from './classes.js';
 import { drawBoard } from './boardUI.js';
@@ -12,7 +12,6 @@ export let mouseX;
 export let mouseY;
 
 export let textWithLink = [
-    new DrawTextWithLink("RESUME", canvas.width / 2, 350, 50, "yellow", [-1], 3, 1),
     new DrawTextWithLink("QUIT", canvas.width / 2, 410, 50, "yellow", [-1], 0, 1),
     new DrawTextWithLink("PLAY", canvas.width / 2, 495, 50, "#333", [2.1, 2.2], 3, 1),
     new DrawTextWithLink("<|", canvas.width / 2 + 80, 496, 50, "#333", [2.1], 2.2, 1),
@@ -154,26 +153,34 @@ export let pawnArray = [
 ];
 
 canvas.addEventListener('keydown', function (e) {
-    if(gamePhase == 0){
-        if(e.key == 'ArrowUp'){
+    if (gamePhase == 0) {
+        if (e.key == 'ArrowUp') {
             changeSelection(3);
-        } else if(e.key == 'ArrowDown'){
+        } else if (e.key == 'ArrowDown') {
             changeSelection(2.1);
         }
 
-        if(e.key == 'z'){
+        if (e.key == 'z') {
             changeTransitionTo(changeSelection());
+        };
+    } else if (gamePhase == 3 && e.key == 'Escape') {
+        // INFO: Game key function will go here.
+        changeTransitionTo(-1);
+        changePauseSelection(3)
+    } else if (gamePhase == -1) {
+        if (e.key == 'Escape') {
+            changeTransitionTo(3);
+        } else if (e.key == 'ArrowUp') {
+            changePauseSelection(3);
+        } else if (e.key == 'ArrowDown') {
+            changePauseSelection(0);
+        }
+
+        if (e.key == 'z') {
+            changeTransitionTo(changePauseSelection());
         };
     };
 });
-
-canvas.addEventListener('keydown', function (e) {
-    if (gamePhase == 3 && e.keyCode == 27) {
-        changeTransitionTo(-1);
-    } else if (gamePhase == -1 && e.keyCode == 27) {
-        changeTransitionTo(3);
-    }
-})
 
 setInterval(() => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
