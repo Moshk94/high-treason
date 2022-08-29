@@ -3,7 +3,7 @@
 // INFO +/- 40 to move along the y axis
 
 import { drawDebuggerGrid, drawText, drawBoard, drawInformationSection } from "./debugTools";
-import pawnSrc from "../src/p.png"
+import pawnSrc from "../src/p2.png"
 
 
 export const ctx = document.getElementById('canvas').getContext("2d");
@@ -177,13 +177,13 @@ class Pawn extends Piece {
     draw(x = this.x, y = this.y, w = 40, h = 60) {
         let deg;
 
-        this.key == 1 ? deg = 65 : 0;
-        this.key == 2 ? deg = -60 : 0;
+        this.key == 1 ? deg = 120 : 0;
+        this.key == 2 ? deg = 0 : 0;
         this.key == 3 ? deg = 180 : 0;
-
-        this.ctxFilterString = `sepia(100%) saturate(500%) hue-rotate(${deg}deg)`;
+        
         ctx.save();
-        ctx.filter = this.ctxFilterString;
+        ctx.filter = `brightness(50%) hue-rotate(${deg}deg)`;
+        // ctx.filter = `hue-rotate(${deg}deg)`;
         ctx.drawImage(pawnImg, x, y, w, h);
         ctx.restore();
         this.animateHP();
@@ -236,7 +236,7 @@ class Pawn extends Piece {
 class Queen extends Piece {
     constructor() {
         super();
-        this.x = 280 + 50
+        this.x = 280
         this.y = 180 + 40
         this.currentHP = 1;
         this.maxHP = 300;
@@ -339,16 +339,15 @@ class Queen extends Piece {
 let queenPiece = new Queen();
 let availableMoves = [];
 export let playerPieces = [
-    new Pawn(1, 3, 5),
-    // new Pawn(2, 5, 1),
-    // new Pawn(3, 2, 1),
+    new Pawn(1, 1, 6),
+    
+    new Pawn(2, 3, 5),
+    new Pawn(3, 5, 6),
 ];
 
 canvas.addEventListener('keydown', function (e) {
     // console.log(`${e.keyCode}: ${e.key}`);
-    if (e.key == ' ') {
-        (console.log(queenPiece.findLegalMoves()))
-    }
+    
     playerPieces.forEach(p => {
         if (playerTurn) {
             if (p.selected) {
@@ -385,8 +384,6 @@ canvas.addEventListener('keydown', function (e) {
             }
 
             p.findLegalMoves(e.key);
-
-            // availableMoves = [];
         }
     });
 });
