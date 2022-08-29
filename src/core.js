@@ -1,4 +1,4 @@
-import { drawTitlePage } from './titlepage.js'
+import { drawTitlePage, changeSelection } from './titlepage.js'
 import { gamePhase, screenFade } from './transitions.js'
 import { drawHelpPlayer, drawHelpEnemy } from './helpPage.js'
 import { pauseScreen } from './playsScreen.js';
@@ -14,8 +14,6 @@ export let mouseY;
 export let textWithLink = [
     new DrawTextWithLink("RESUME", canvas.width / 2, 350, 50, "yellow", [-1], 3, 1),
     new DrawTextWithLink("QUIT", canvas.width / 2, 410, 50, "yellow", [-1], 0, 1),
-    
-    new DrawTextWithLink("HELP", canvas.width / 2, 495, 50, "#333", [0], 2.1, 1),
     new DrawTextWithLink("PLAY", canvas.width / 2, 495, 50, "#333", [2.1, 2.2], 3, 1),
     new DrawTextWithLink("<|", canvas.width / 2 + 80, 496, 50, "#333", [2.1], 2.2, 1),
     new DrawTextWithLink("|>", canvas.width / 2 - 80, 496, 50, "#333", [2.2], 2.1, 1),
@@ -155,46 +153,19 @@ export let pawnArray = [
     new Pawn(47, 200),
 ];
 
-canvas.addEventListener('mousemove', function (e) {
-    let rect = canvas.getBoundingClientRect();
-    mouseX = e.clientX - rect.left
-    mouseY = e.clientY - rect.top
-}, false);
+canvas.addEventListener('keydown', function (e) {
+    if(gamePhase == 0){
+        if(e.key == 'ArrowUp'){
+            changeSelection(3);
+        } else if(e.key == 'ArrowDown'){
+            changeSelection(2.1);
+        }
 
-canvas.addEventListener('mouseup', function (e) {
-    if (gamePhase == -1) {
-        pauseScreen(mouseX, mouseY, e)
-    }
-
-
-    textWithLink.forEach(e => {
-        e.click();
-    });
-
-    if (gamePhase == 3) {
-        ghostArray.forEach(e => {
-            if (e.isWithinBounds()) {
-                e.click();
-            }
-        });
-
-        ghostArray = [];
-
-        pawnArray.forEach(e => {
-            e.selected = 0;
-            e.click();
-            if (!e.isWithinBounds()) {
-                e.selected = 0;
-            };
-
-            if (e.selected) {
-                ghostArray = [];
-                e.findLegalMoves();
-            };
-        })
-
-    }
-}, false);
+        if(e.key == 'z'){
+            changeTransitionTo(changeSelection());
+        };
+    };
+});
 
 canvas.addEventListener('keydown', function (e) {
     if (gamePhase == 3 && e.keyCode == 27) {
@@ -219,9 +190,6 @@ setInterval(() => {
         allPiece.forEach(e => { e.draw(); });
     };
 
-    for (let i = 2; i < textWithLink.length; i++) {
-        textWithLink[i].draw();
-    }
     screenFade();
 }, 1 / 60);
 

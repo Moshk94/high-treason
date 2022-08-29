@@ -106,3 +106,44 @@ isWithinBounds() {
             }
 
 */
+
+
+/* INFO: Old live selection code
+
+// canvas.addEventListener('mousemove', function (e) {
+//     let rect = canvas.getBoundingClientRect();
+//     mouseX = e.clientX - rect.left
+//     mouseY = e.clientY - rect.top
+// }, false);
+
+// canvas.addEventListener('mouseup', function (e) {
+//     if (gamePhase == -1) {
+//         pauseScreen(mouseX, mouseY, e)
+//     }
+    
+
+//     if (gamePhase == 3) {
+//         ghostArray.forEach(e => {
+//             if (e.isWithinBounds()) {
+//                 e.click();
+//             }
+//         });
+
+//         ghostArray = [];
+
+//         pawnArray.forEach(e => {
+//             e.selected = 0;
+//             e.click();
+//             if (!e.isWithinBounds()) {
+//                 e.selected = 0;
+//             };
+
+//             if (e.selected) {
+//                 ghostArray = [];
+//                 e.findLegalMoves();
+//             };
+//         })
+
+//     }
+// }, false);
+*/
