@@ -10,7 +10,7 @@ export function drawText(text, centerX, centerY, fontsize, color = '#333') {
     ctx.restore();
 };
 
-export function drawTextWithShadow(text, centerX, centerY, fontsize){
-    drawText(text,centerX,centerY + 10,fontsize, 'black')
-    drawText(text,centerX,centerY,fontsize, 'white')
+export function drawTextWithShadow(text, centerX, centerY, fontsize, color = 'white'){
+    drawText(text,centerX,centerY + fontsize/10,fontsize, 'black')
+    drawText(text,centerX,centerY,fontsize, color)
 }
