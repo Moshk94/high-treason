@@ -9,3 +9,8 @@ export function drawText(text, centerX, centerY, fontsize, color = '#333') {
     ctx.fillText(text, centerX, centerY);
     ctx.restore();
 };
+
+export function drawTextWithShadow(text, centerX, centerY, fontsize){
+    drawText(text,centerX,centerY + 10,fontsize, 'black')
+    drawText(text,centerX,centerY,fontsize, 'white')
+}
