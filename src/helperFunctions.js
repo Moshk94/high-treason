@@ -11,6 +11,6 @@ export function drawText(text, centerX, centerY, fontsize, color = '#333') {
 };
 
 export function drawTextWithShadow(text, centerX, centerY, fontsize, color = 'white'){
-    drawText(text,centerX,centerY + fontsize/10,fontsize, 'black')
-    drawText(text,centerX,centerY,fontsize, color)
-}
+    drawText(text,centerX,centerY + fontsize/10,fontsize, 'black');
+    drawText(text,centerX,centerY,fontsize, color);
+};
