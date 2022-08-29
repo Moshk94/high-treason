@@ -3,20 +3,9 @@ import { gamePhase, screenFade } from './transitions.js'
 import { drawHelpPlayer, drawHelpEnemy } from './helpPage.js'
 import { pauseScreen, changePauseSelection } from './playsScreen.js';
 import { changeTransitionTo } from "./transitions";
-import { DrawTextWithLink } from './classes.js';
 import { drawBoard } from './boardUI.js';
 import { drawText } from './helperFunctions.js';
 export const ctx = document.getElementById('canvas').getContext("2d");
-
-export let mouseX;
-export let mouseY;
-
-export let textWithLink = [
-    new DrawTextWithLink("QUIT", canvas.width / 2, 410, 50, "yellow", [-1], 0, 1),
-    new DrawTextWithLink("PLAY", canvas.width / 2, 495, 50, "#333", [2.1, 2.2], 3, 1),
-    new DrawTextWithLink("<|", canvas.width / 2 + 80, 496, 50, "#333", [2.1], 2.2, 1),
-    new DrawTextWithLink("|>", canvas.width / 2 - 80, 496, 50, "#333", [2.2], 2.1, 1),
-];
 
 const boardX = 125;
 const boardY = 200;

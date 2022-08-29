@@ -1,7 +1,5 @@
 import { drawText, drawTextWithShadow } from "./helperFunctions";
 
-import { textWithLink } from "./core";
-
 let selectedPausedOption = 3;
 export function changePauseSelection(x) {
     if(x == undefined){
@@ -22,6 +20,4 @@ export function pauseScreen() {
         drawTextWithShadow("RESUME", canvas.width / 2, 350, 50, "white")
         drawTextWithShadow("QUIT", canvas.width / 2, 410, 50, "yellow")
     }
-    
-    textWithLink[1].draw();
 };
