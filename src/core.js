@@ -1,7 +1,7 @@
 import { drawTitlePage, changeSelection } from './titlepage.js'
 import { gamePhase, screenFade } from './transitions.js'
 import { drawHelpPlayer, drawHelpEnemy } from './helpPage.js'
-import { pauseScreen, changePauseSelection } from './playsScreen.js';
+import { pauseScreen, changePauseSelection } from './pauseScreen.js';
 import { changeTransitionTo } from "./transitions";
 import { drawBoard } from './boardUI.js';
 import { drawText } from './helperFunctions.js';
