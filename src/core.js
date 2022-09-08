@@ -13,16 +13,14 @@ let fired = false;
 canvas.onkeyup = function () { fired = false };
 
 canvas.addEventListener('keydown', function (e) {
-    if(!fired){
+    if (!fired) {
         fired = true;
         if (gamePhase == 0) {
-            if (e.key == 'ArrowUp') {
-                changeSelection(3);
-            } else if (e.key == 'ArrowDown') {
-                changeSelection(2.1);
+            if (e.key == 'ArrowUp' || e.key == 'ArrowDown') {
+                changeSelection();
             }
             if (e.key == 'z') {
-                changeTransitionTo(changeSelection());
+                changeTransitionTo(changeSelection(1));
             };
         } else if (gamePhase == 3 && e.key == 'Escape') {
             // INFO: Game key function will go here.
@@ -36,7 +34,7 @@ canvas.addEventListener('keydown', function (e) {
             } else if (e.key == 'ArrowDown') {
                 changePauseSelection(0);
             }
-    
+
             if (e.key == 'z') {
                 changeTransitionTo(changePauseSelection());
             };

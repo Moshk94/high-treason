@@ -4,10 +4,14 @@ import { drawTextWithShadow } from "./helperFunctions";
 const TITLE = 'HIGH TREASON';
 let selectedOption = 3;
 export function changeSelection(x) {
-    if(x == undefined){
+    if (x) {
         return selectedOption
     } else {
-        selectedOption = x;
+        if (selectedOption == 3) {
+            selectedOption = 2.1
+        } else if (selectedOption == 2.1) {
+            selectedOption = 3
+        };
     };
 };
 
