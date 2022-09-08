@@ -9,7 +9,10 @@ import { rads, FLOOR } from './helperFunctions.js';
 export const ctx = document.getElementById('canvas').getContext("2d");
 
 const pawnImg = new Image();
+const queenImg = new Image();
+
 pawnImg.src = 'p.png';
+queenImg.src = 'q.png';
 
 let fired = false;
 canvas.onkeyup = function () { fired = false };
