@@ -4,6 +4,8 @@ import { drawHelpPlayer, drawHelpEnemy } from './helpPage.js'
 import { changePauseSelection } from './pauseScreen.js';
 import { changeTransitionTo } from "./transitions";
 import { drawBoard } from './boardUI.js';
+import { rads } from './helperFunctions.js';
+
 export const ctx = document.getElementById('canvas').getContext("2d");
 
 const pawnImg = new Image();

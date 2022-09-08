@@ -14,3 +14,5 @@ export function drawTextWithShadow(text, centerX, centerY, fontsize, color = 'wh
     drawText(text,centerX,centerY + fontsize/10,fontsize, 'black');
     drawText(text,centerX,centerY,fontsize, color);
 };
+
+export function rads(d){return d * 0.01745};
