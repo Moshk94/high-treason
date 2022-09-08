@@ -9,35 +9,39 @@ export const ctx = document.getElementById('canvas').getContext("2d");
 const pawnImg = new Image();
 pawnImg.src = 'p.png';
 
+let fired = false;
+canvas.onkeyup = function () { fired = false };
 
 canvas.addEventListener('keydown', function (e) {
-    if (gamePhase == 0) {
-        if (e.key == 'ArrowUp') {
-            changeSelection(3);
-        } else if (e.key == 'ArrowDown') {
-            changeSelection(2.1);
-        }
-
-        if (e.key == 'z') {
-            changeTransitionTo(changeSelection());
+    if(!fired){
+        fired = true;
+        if (gamePhase == 0) {
+            if (e.key == 'ArrowUp') {
+                changeSelection(3);
+            } else if (e.key == 'ArrowDown') {
+                changeSelection(2.1);
+            }
+            if (e.key == 'z') {
+                changeTransitionTo(changeSelection());
+            };
+        } else if (gamePhase == 3 && e.key == 'Escape') {
+            // INFO: Game key function will go here.
+            changeTransitionTo(-1);
+            changePauseSelection(3)
+        } else if (gamePhase == -1) {
+            if (e.key == 'Escape') {
+                changeTransitionTo(3);
+            } else if (e.key == 'ArrowUp') {
+                changePauseSelection(3);
+            } else if (e.key == 'ArrowDown') {
+                changePauseSelection(0);
+            }
+    
+            if (e.key == 'z') {
+                changeTransitionTo(changePauseSelection());
+            };
         };
-    } else if (gamePhase == 3 && e.key == 'Escape') {
-        // INFO: Game key function will go here.
-        changeTransitionTo(-1);
-        changePauseSelection(3)
-    } else if (gamePhase == -1) {
-        if (e.key == 'Escape') {
-            changeTransitionTo(3);
-        } else if (e.key == 'ArrowUp') {
-            changePauseSelection(3);
-        } else if (e.key == 'ArrowDown') {
-            changePauseSelection(0);
-        }
-
-        if (e.key == 'z') {
-            changeTransitionTo(changePauseSelection());
-        };
-    };
+    }
 });
 
 setInterval(() => {
