@@ -14,6 +14,9 @@ const queenImg = new Image();
 pawnImg.src = 'p.png';
 queenImg.src = 'q.png';
 
+let queenPiece;
+let playerPieces = [];
+
 export class Piece {
     constructor() {
     }
