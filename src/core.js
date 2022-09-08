@@ -14,6 +14,7 @@ const queenImg = new Image();
 pawnImg.src = 'p.png';
 queenImg.src = 'q.png';
 
+let fired = false;
 let queenPiece;
 let playerPieces = [];
 
@@ -304,8 +305,6 @@ class Pawn extends Piece {
         return canAttack;
     };
 };
-
-let fired = false;
 canvas.onkeyup = function () { fired = false };
 
 canvas.addEventListener('keydown', function (e) {
@@ -316,6 +315,14 @@ canvas.addEventListener('keydown', function (e) {
                 changeSelection();
             }
             if (e.key == 'z') {
+                queenPiece = undefined;
+                playerPieces = [];
+                queenPiece = new Queen(10);
+                playerPieces = [
+                    new Pawn(44, 1),
+                    new Pawn(38, 2),
+                    new Pawn(46, 3)
+                ];
                 changeTransitionTo(changeSelection(1));
             };
         } else if (gamePhase == 3 && e.key == 'Escape') {
