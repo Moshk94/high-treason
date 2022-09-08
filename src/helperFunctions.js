@@ -17,4 +17,27 @@ export function drawTextWithShadow(text, centerX, centerY, fontsize, color = 'wh
 
 export function rads(d){return d * 0.01745};
 
-export const FLOOR = Math.floor
+export const FLOOR = Math.floor;
+
+export const dir = {
+    'ArrowUp': {
+        x: 0,
+        y: -40,
+        p: -7
+    },
+    'ArrowDown': {
+        x: 0,
+        y: 40,
+        p: 7
+    },
+    'ArrowRight': {
+        x: 50,
+        y: 0,
+        p: 1
+    },
+    'ArrowLeft': {
+        x: -50,
+        y: 0,
+        p: -1
+    },
+};
