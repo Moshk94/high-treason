@@ -13,7 +13,7 @@ export function drawHelpPlayer(){
     
     drawText("CAN HEAL OTHER PIECES IN RANGE AND", canvas.width / 2, 350, 20, 'white');
     drawText("REMOVE CURSE FROM PIECES", canvas.width / 2, 365, 20, 'white');
-    drawText("(HEALING IS DISTRIBUTED ACCROSS ALL PIECES IN RANGE)", canvas.width / 2, 380, 20, 'white');
+   
 
     drawText("CAN INCREASE PIECE ATTACK", canvas.width / 2, 430, 20, 'white');
 };

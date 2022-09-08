@@ -1,10 +1,7 @@
-import { drawTitlePage, changeSelection } from './titlepage.js'
-import { gamePhase, screenFade } from './transitions.js'
 import { drawHelpPlayer, drawHelpEnemy } from './helpPage.js'
 import { changePauseSelection } from './pauseScreen.js';
-import { changeTransitionTo } from "./transitions";
 import { drawBoard, boardX, boardY, cellSize } from './boardUI.js';
-import { rads, FLOOR, dir, drawText} from './helperFunctions.js';
+import { rads, FLOOR, dir, drawText, drawTextWithShadow } from './helperFunctions.js';
 
 export const ctx = document.getElementById('canvas').getContext("2d");
 export let allPiece;
@@ -14,10 +11,14 @@ export const PI = Math.PI;
 
 const pawnImg = new Image();
 const queenImg = new Image();
-
+export let gamePhase = 0;
+const transitionSpeed = 0.06;
+let isTransioning = 0;
+let alpha = 0;
+let transitionTo;
 pawnImg.src = 'p.png';
 queenImg.src = 'q.png';
-
+let selectedOption = 3;
 let fired = false;
 let queenPiece;
 let playerPieces = [];
@@ -28,7 +29,9 @@ let availableMoves = [];
 let start;
 let specialUI = [];
 let playSpecial = 0;
-
+let lock = false;
+let dt = 0;
+step();
 export class Piece {
     constructor() {
     }
@@ -234,11 +237,12 @@ class Queen extends Piece {
         this.animateSpecial()
     }
     moveQueen() {
+        console.log("ok")
         if (!playerTurn && moveToo == undefined && !isGameOver()) {
 
-            if ((turn/3) % 5 == 0 && turn > 0) {
+            if ((turn / 3) % 5 == 0 && turn > 0) {
                 this.cursePiece();
-            } else if ((turn/2) % 5 == 0 && turn > 0) {
+            } else if ((turn / 2) % 5 == 0 && turn > 0) {
                 this.heal();
             } else if ((turn % 5) == 0 && turn > 0) {
                 this.buffAttack();
@@ -287,10 +291,10 @@ class Pawn extends Piece {
         this.key == 2 ? deg = 0 : 0;
         this.key == 3 ? deg = 180 : 0;
         ctx.save();
-        
-        if(this.hpAnimate == 0 && !i){
+
+        if (this.hpAnimate == 0 && !i) {
             this.moveY = this.parsePosition(this.boardPosition).y + 25;
-            this.opacity > 0 ? this.opacity-=10 : this.opacity = 0;
+            this.opacity > 0 ? this.opacity -= 10 : this.opacity = 0;
             this.color = `brightness(50%) hue-rotate(${deg}deg) opacity(${this.opacity}%)`;
         } else {
             this.color = `brightness(50%) hue-rotate(${deg}deg)`;
@@ -323,6 +327,7 @@ canvas.addEventListener('keydown', function (e) {
         fired = true;
         if (gamePhase == 0) {
             if (e.key == 'ArrowUp' || e.key == 'ArrowDown') {
+                console.log(2)
                 changeSelection();
             }
             if (e.key == 'z') {
@@ -334,12 +339,90 @@ canvas.addEventListener('keydown', function (e) {
                     new Pawn(38, 2),
                     new Pawn(46, 3)
                 ];
+                playerTurn = 1;
                 changeTransitionTo(changeSelection(1));
             };
-        } else if (gamePhase == 3 && e.key == 'Escape') {
+        } else if (gamePhase == 3) {
             // INFO: Game key function will go here.
-            changeTransitionTo(-1);
-            changePauseSelection(3)
+            if (playerTurn) {
+                if (e.key < 4) {
+                    availableMoves = [];
+                    playerPieces.forEach(z => {
+                        z.selected = 0;
+                    })
+                    if (e.key == 1 && playerPieces[e.key - 1].hpAnimate) {
+                        playerPieces[e.key - 1].selected = 1;
+                        playerPieces[e.key - 1].findLegalMoves().forEach(m => {
+                            availableMoves.push(new Moves(m, playerPieces[e.key - 1]));
+                        });
+                    };
+                    if (e.key == 2 && playerPieces[e.key - 1].hpAnimate) {
+                        playerPieces[e.key - 1].selected = 1;
+                        playerPieces[e.key - 1].findLegalMoves().forEach(m => {
+                            availableMoves.push(new Moves(m, playerPieces[e.key - 1]));
+                        });
+                    };
+                    if (e.key == 3 && playerPieces[e.key - 2].hpAnimate) {
+                        playerPieces[e.key - 1].selected = 1;
+                        playerPieces[e.key - 1].findLegalMoves().forEach(m => {
+                            availableMoves.push(new Moves(m, playerPieces[e.key - 1]));
+                        });
+                    };
+                };
+            };
+            if (e.key == 'x') {
+                if (playerPieces[0].selected) {
+                    let piecesToHealCure = playerPieces[0].heal();
+                    piecesToHealCure.forEach(pHC => {
+                        specialUI.push(pHC)
+                    });
+                    playerPieces[0].animateSpecial();
+                    lock = false
+                    playerPieces[0].selected = 0;
+                } else if (playerPieces[1].selected) {
+                    let piecesToBuff = playerPieces[1].buffAttack();
+                    specialUI.push({ t: 'a', v: 5, l: playerPieces[1], y: playerPieces[1].y });
+                    if (piecesToBuff.length > 0) {
+                        piecesToBuff.forEach(b => {
+                            specialUI.push({ t: 'a', v: 10, l: b, y: b.y })
+                        });
+                    };
+                    lock = false
+                    playerPieces[1].animateSpecial();
+                };
+                availableMoves = [];
+            };
+            let findSelectedIndex = playerPieces.findIndex(i => i.selected == 1);
+            if (findSelectedIndex >= 0) {
+                if (e.key == 'ArrowUp') {
+                    movePiece(dir[e.key], findSelectedIndex);
+                };
+                if (e.key == 'ArrowDown') {
+                    movePiece(dir[e.key], findSelectedIndex);
+                };
+                if (e.key == 'ArrowLeft') {
+                    movePiece(dir[e.key], findSelectedIndex);
+                };
+                if (e.key == 'ArrowRight') {
+                    movePiece(dir[e.key], findSelectedIndex);
+                };
+                if (e.key == 'z') {
+                    let s = playerPieces[findSelectedIndex];
+
+                    if (s.attackPiece()) {
+                        playerPieces[findSelectedIndex].attackAnimation(queenPiece, playerPieces[findSelectedIndex].attack);
+                        lock = false
+                        endMoves();
+                    };
+                    availableMoves = [];
+                    s.selected = 0;
+                };
+            };
+
+            if (e.key == 'Escape') {
+                changeTransitionTo(-1);
+                changePauseSelection(3);
+            }
         } else if (gamePhase == -1) {
             if (e.key == 'Escape') {
                 changeTransitionTo(3);
@@ -356,7 +439,8 @@ canvas.addEventListener('keydown', function (e) {
     }
 });
 
-setInterval( timestamp => {
+function step(timestamp) {
+    window.requestAnimationFrame(step);
     start ? 0 : start = timestamp;
     const elapsed = timestamp - start;
     time = elapsed / 1000;
@@ -373,8 +457,8 @@ setInterval( timestamp => {
     } else if (gamePhase == 3 || gamePhase == -1) {
         drawBoard();
         allPiece = [...availableMoves, ...playerPieces, queenPiece].sort(function (a, b) { return a.y - b.y });
-        allPiece.forEach(e => { e.draw() });
-        drawInformationSection();
+        allPiece.forEach(e => { if (e) { e.draw() } });
+        if (playerPieces.length > 0 && queenPiece) { drawInformationSection() }
         if (playerTurn == 0 && time > 0.25) {
             queenPiece.moveQueen();
             playerTurn = 1;
@@ -392,7 +476,7 @@ setInterval( timestamp => {
                 if (u.t == 'c') {
                     u.s += 10;
                     u.o -= 0.03;
-    
+
                     drawText('☠️', xPos + 25, yPos, u.s, `rgba(0,0,0,${u.o})`);
                     if (u.o < 0) {
                         playSpecial = 0;
@@ -405,7 +489,7 @@ setInterval( timestamp => {
                     drawText(`❤️+${u.v}`, xPos + 25, u.y, 25, `green`);
                     if (u.y == yPos - 15) { u.l.hpAnimate += 20 }
                     if (u.y < yPos - 30) {
-    
+
                         playSpecial = 0;
                         specialUI = [];
                         endMoves();
@@ -421,9 +505,9 @@ setInterval( timestamp => {
                     };
                 } else if (u.t == 'a') {
                     u.y--;
-    
+
                     drawText(`⚔️+${u.v}`, xPos + 25, u.y, 30, `white`);
-    
+
                     if (u.y == yPos - 15) { u.l.attack += u.v }
                     if (u.y <= yPos - 30) {
                         playSpecial = 0;
@@ -444,8 +528,7 @@ setInterval( timestamp => {
         };
     };
     screenFade();
-    
-}, 1 / 60);
+};
 
 
 function drawInformationSection() {
@@ -580,3 +663,132 @@ function findBestMove(MMBoard, depth, maximisingPlayer) {
         return maxEvaluation
     };
 };
+function movePiece(v, c) {
+    let s = playerPieces[c];
+    if (availableMoves.findIndex(i => i.position == s.boardPosition + v.p) >= 0 &&
+        allPiece.findIndex(i => i.boardPosition == s.boardPosition + v.p) == -1) {
+
+        s.moveY += v.y;
+        s.moveX += v.x;
+        s.selected = 0;
+        s.boardPosition += v.p;
+        lock = false
+        endMoves();
+    };
+    availableMoves = [];
+};
+
+function endMoves() {
+    if (playerTurn && !lock) {
+        turn++
+        playerTurn = 0;
+        time = 0
+        start = 0;
+        lock = true
+    };
+};
+
+function isGameOver(){
+    let queenHealth = queenPiece.hpAnimate;
+    let sumOfAllPlayerHealth = 0;
+    playerPieces.forEach(h =>{
+        sumOfAllPlayerHealth+=h.hpAnimate;
+    })
+
+    if(queenHealth == 0 || sumOfAllPlayerHealth == 0){
+        return true;
+    } else {
+        return false;
+    };
+};
+
+
+export function changeSelection(x) {
+    if (x) {
+        return selectedOption
+    } else {
+        if (selectedOption == 3) {
+            selectedOption = 2.1
+        } else if (selectedOption == 2.1) {
+            selectedOption = 3
+        };
+    };
+};
+
+export function drawTitlePage() {
+    const TITLE = 'HIGH TREASON';
+    ctx.beginPath();
+    ctx.fillStyle = '#265b5f';
+    ctx.fillRect(50, 250, canvas.width - 110, 310);
+    ctx.closePath();
+    drawTextWithShadow(TITLE, canvas.width / 2, 310, 90);
+    if (selectedOption == 3) {
+        drawTextWithShadow("PLAY", canvas.width / 2, 405, 70, "yellow");
+        drawTextWithShadow("HELP", canvas.width / 2, 465, 50, "white");
+    } else {
+        drawTextWithShadow("PLAY", canvas.width / 2, 405, 70, "white");
+        drawTextWithShadow("HELP", canvas.width / 2, 465, 50, "yellow");
+    }
+};
+
+
+// Transitions
+
+
+
+export function screenFade() {
+    if (isTransioning) {
+        if (gamePhase == 3 && transitionTo == -1) {
+            if (alpha < 0.8) {
+                alpha += transitionSpeed;
+            } else {
+                gamePhase = transitionTo;
+                isTransioning = 0;
+            }
+        } else if (gamePhase == -1 && transitionTo == 3) {
+            if (alpha > 0) {
+                alpha -= transitionSpeed;
+            } else {
+                gamePhase = transitionTo;
+                isTransioning = 0;
+            }
+        } else {
+            if (alpha <= 2) {
+                alpha += transitionSpeed;
+            } else if (alpha > 2) {
+                gamePhase = transitionTo;
+                isTransioning = 0;
+            };
+        }
+    } if (!isTransioning) {
+        if (gamePhase != -1) {
+            if (alpha >= 0) {
+                alpha -= (0.06);
+                transitionTo = undefined;
+            };
+        };
+    };
+
+    if (gamePhase == -1) {
+        if (transitionTo == 0) {
+            pauseScreen();
+            fade(alpha)
+        } else {
+            fade(alpha);
+            pauseScreen();
+        }
+    } else {fade(alpha)}
+};
+
+export function changeTransitionTo(x) {
+    transitionTo = x;
+    isTransioning = 1;
+};
+
+function fade(ap) {
+    ctx.beginPath();
+    ctx.fillStyle = `rgba(0, 0, 0, ${ap})`;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fill();
+    ctx.closePath();
+}
