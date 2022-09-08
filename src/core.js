@@ -17,6 +17,13 @@ queenImg.src = 'q.png';
 let fired = false;
 let queenPiece;
 let playerPieces = [];
+let time = 0;
+let moveToo;
+let turn = 0;
+let availableMoves = [];
+let start;
+let specialUI = [];
+let playSpecial = 0;
 
 export class Piece {
     constructor() {
@@ -345,7 +352,10 @@ canvas.addEventListener('keydown', function (e) {
     }
 });
 
-setInterval(() => {
+setInterval( timestamp => {
+    start ? 0 : start = timestamp;
+    const elapsed = timestamp - start;
+    time = elapsed / 1000;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     if (gamePhase == 0) {
         // Title Screen
@@ -360,4 +370,5 @@ setInterval(() => {
         drawBoard();
     };
     screenFade();
+    
 }, 1 / 60);
