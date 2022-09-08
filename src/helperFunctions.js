@@ -16,3 +16,5 @@ export function drawTextWithShadow(text, centerX, centerY, fontsize, color = 'wh
 };
 
 export function rads(d){return d * 0.01745};
+
+export const FLOOR = Math.floor
