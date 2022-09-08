@@ -3,10 +3,14 @@ import { gamePhase, screenFade } from './transitions.js'
 import { drawHelpPlayer, drawHelpEnemy } from './helpPage.js'
 import { changePauseSelection } from './pauseScreen.js';
 import { changeTransitionTo } from "./transitions";
-import { drawBoard } from './boardUI.js';
-import { rads, FLOOR, dir} from './helperFunctions.js';
+import { drawBoard, boardX, boardY, cellSize } from './boardUI.js';
+import { rads, FLOOR, dir, drawText} from './helperFunctions.js';
 
 export const ctx = document.getElementById('canvas').getContext("2d");
+export let allPiece;
+export let playerTurn = 1;
+export let moveTo;
+export const PI = Math.PI;
 
 const pawnImg = new Image();
 const queenImg = new Image();
@@ -368,7 +372,211 @@ setInterval( timestamp => {
         drawHelpEnemy();
     } else if (gamePhase == 3 || gamePhase == -1) {
         drawBoard();
+        allPiece = [...availableMoves, ...playerPieces, queenPiece].sort(function (a, b) { return a.y - b.y });
+        allPiece.forEach(e => { e.draw() });
+        drawInformationSection();
+        if (playerTurn == 0 && time > 0.25) {
+            queenPiece.moveQueen();
+            playerTurn = 1;
+            moveToo = undefined;
+            playerPieces.forEach(c => {
+                if (c.cursed > 0) {
+                    c.hpAnimate -= c.cursed * 5;
+                };
+            });
+        };
+        if (playSpecial && specialUI.length > 0) {
+            specialUI.forEach(u => {
+                let xPos = 130 + (50 * (u.l.boardPosition % 7));
+                let yPos = 180 + (40 * (FLOOR(u.l.boardPosition / 7)));
+                if (u.t == 'c') {
+                    u.s += 10;
+                    u.o -= 0.03;
+    
+                    drawText('☠️', xPos + 25, yPos, u.s, `rgba(0,0,0,${u.o})`);
+                    if (u.o < 0) {
+                        playSpecial = 0;
+                        specialUI = [];
+                        u.l.cursed++;
+                        endMoves();
+                    };
+                } else if (u.t == 'h') {
+                    u.y--;
+                    drawText(`❤️+${u.v}`, xPos + 25, u.y, 25, `green`);
+                    if (u.y == yPos - 15) { u.l.hpAnimate += 20 }
+                    if (u.y < yPos - 30) {
+    
+                        playSpecial = 0;
+                        specialUI = [];
+                        endMoves();
+                    };
+                } else if (u.t == 'd') {
+                    u.y--;
+                    drawText(`❤️-${u.v}`, xPos + 25, u.y, 25, `red`);
+                    if (u.y == yPos - 5) { u.l.hpAnimate -= u.v }
+                    if (u.y < yPos - 30) {
+                        playSpecial = 0;
+                        specialUI = [];
+                        endMoves();
+                    };
+                } else if (u.t == 'a') {
+                    u.y--;
+    
+                    drawText(`⚔️+${u.v}`, xPos + 25, u.y, 30, `white`);
+    
+                    if (u.y == yPos - 15) { u.l.attack += u.v }
+                    if (u.y <= yPos - 30) {
+                        playSpecial = 0;
+                        specialUI = [];
+                        endMoves();
+                    };
+                } else if (u.t == '-c') {
+                    u.y--;
+                    drawText(`☠️-${u.v}`, xPos + 25, u.y, 25, `green`);
+                    if (u.y == yPos - 15) { u.l.cursed -= u.v }
+                    if (u.y < yPos - 30) {
+                        playSpecial = 0;
+                        specialUI = [];
+                        endMoves();
+                    };
+                };
+            });
+        };
     };
     screenFade();
     
 }, 1 / 60);
+
+
+function drawInformationSection() {
+    for (let i = 0; i < playerPieces.length; i++) {
+        const infoX = boardX - 50 + (175 * i);
+        const dx = 20;
+
+        ctx.fillStyle = "black";
+        ctx.fillRect(infoX, boardY + cellSize * 7 - 25, 130, 75);
+
+        ctx.fillStyle = "grey"
+        ctx.fillRect(infoX, boardY + cellSize * 7 - 25, 130, 20);
+
+        drawText(`${playerPieces[i].currentHP} / ${playerPieces[i].maxHP}`, infoX + 75, boardY + cellSize * 7 - 16, 25, 'white');
+
+        drawText(`⚔️${playerPieces[i].attack}`, infoX + 75, boardY + cellSize * 7 + 10, 25, 'white');
+        let curseColor = playerPieces[i].cursed == 0 ? 'rgba(0,128,0,0.5)' : 'rgba(255,0,0,1)'
+        drawText(`☠️${playerPieces[i].cursed}`, infoX + 75, boardY + cellSize * 7 + 36, 20, curseColor);
+
+        ctx.beginPath();
+        ctx.strokeStyle = 'red';
+        ctx.lineWidth = 3;
+        ctx.arc(infoX, boardY + cellSize * 7 - 10, 20, 0, 2 * PI);
+        ctx.stroke();
+        ctx.fillStyle = "black"
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.strokeStyle = 'green';
+        ctx.lineWidth = 3;
+        ctx.arc(infoX, boardY + cellSize * 7 - 10, 20, -PI / 2, (PI * 2) * playerPieces[i].currentHP / playerPieces[i].maxHP - PI / 2);
+        ctx.stroke();
+
+        playerPieces[i].draw(infoX - 10, boardY + cellSize * 7 - 25, dx, dx * 1.5, 1);
+    };
+
+    ctx.fillStyle = "black";
+    ctx.fillRect(boardX, boardY - cellSize * 2, 350, 50);
+
+    ctx.fillStyle = "grey"
+    ctx.fillRect(boardX, boardY - cellSize * 2, 350, 20);
+
+    ctx.fillStyle = "darkgreen"
+    ctx.fillRect(boardX, boardY - cellSize * 2, 350 * (queenPiece.currentHP / queenPiece.maxHP), 20);
+
+    drawText(`${queenPiece.currentHP} / ${queenPiece.maxHP}`, boardX + 175, boardY - cellSize * 2 + 9, 25, 'white');
+
+    drawText(`⚔️${queenPiece.attack}`, boardX + 175, boardY - cellSize * 2 + 36, 25, 'white');
+
+    ctx.beginPath();
+    ctx.strokeStyle = 'darkred';
+    ctx.lineWidth = 5;
+    ctx.arc(boardX, boardY - cellSize * 2 + 25, 30, 0, 2 * PI);
+    ctx.stroke();
+    ctx.fillStyle = "black"
+    ctx.fill();
+
+    ctx.save();
+    ctx.filter = 'brightness(50%)';
+    ctx.drawImage(queenImg, boardX - 25, boardY - 130);
+    ctx.restore();
+};
+
+function findBestMove(MMBoard, depth, maximisingPlayer) {
+    let qL = MMBoard[MMBoard.findIndex(i => i.t === "Q")]
+    if (depth == 0 || qL.currentHP == 0) {
+        let sc = 0
+        MMBoard.forEach(s => {
+
+            sc += s.updateScore()
+        });
+        return sc;
+    };
+
+    if (!maximisingPlayer) {
+        let minEvaluation = Infinity;
+        let qO = Object.assign(Object.create(Object.getPrototypeOf(qL)), qL);
+        qL.findLegalMoves().forEach(m => {
+            let pL = MMBoard[MMBoard.findIndex(i => i.boardPosition === m)];
+
+
+            if (pL) {
+                let pO = Object.assign(Object.create(Object.getPrototypeOf(pL)), pL);
+                pL.currentHP -= qL.attack
+
+                let calculateMinValue = findBestMove(MMBoard, depth - 1, true);
+                pL.currentHP = pO.currentHP;
+                if (calculateMinValue < minEvaluation) {
+                    minEvaluation = calculateMinValue;
+                    moveTo = m;
+                };
+            }
+
+            if (!pL) {
+                qL.boardPosition = m;
+                let calculateMinValue = findBestMove(MMBoard, depth - 1, true);
+                qL.boardPosition = qO.boardPosition;
+                if (calculateMinValue < minEvaluation) {
+                    minEvaluation = calculateMinValue;
+                    moveTo = m;
+                };
+            }
+        });
+        return minEvaluation;
+    };
+
+    if (maximisingPlayer) {
+        let maxEvaluation = -Infinity;
+        MMBoard.forEach(p => {
+            if (p.t == "P") {
+                if (p.attackPiece()) {
+                    let qO = Object.assign(Object.create(Object.getPrototypeOf(qL)), qL);
+                    qL.currentHP -= p.attack;
+                    let caclulatedMaxValue = findBestMove(MMBoard, depth - 1, false);
+                    qL.currentHP = qO.currentHP;
+                    if (caclulatedMaxValue > maxEvaluation) {
+                        maxEvaluation = caclulatedMaxValue
+                    };
+                };
+
+                p.findLegalMoves().forEach(m => {
+                    let pO = Object.assign(Object.create(Object.getPrototypeOf(p)), p);
+                    p.boardPosition = m;
+                    let caclulatedMaxValue = findBestMove(MMBoard, depth - 1, false);
+                    p.boardPosition = pO.boardPosition;
+                    if (caclulatedMaxValue > maxEvaluation) {
+                        maxEvaluation = caclulatedMaxValue
+                    };
+                })
+            };
+        });
+        return maxEvaluation
+    };
+};
