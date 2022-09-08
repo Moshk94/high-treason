@@ -150,6 +150,158 @@ export class Piece {
     };
 };
 
+export class Moves extends Piece {
+    constructor(p, owner) {
+        super();
+        this.x = this.parsePosition(p).x;
+        this.y = this.parsePosition(p).y;
+        this.color = `${owner.color} opacity(50%)`;
+        this.position = p;
+    };
+    draw() {
+        ctx.save();
+        ctx.filter = this.color;
+        ctx.drawImage(pawnImg, this.x, this.y);
+        ctx.restore();
+    };
+};
+
+class Queen extends Piece {
+    constructor(boardPosition) {
+        super();
+        this.x = this.parsePosition(boardPosition).x;
+        this.y = this.parsePosition(boardPosition).y;
+        this.boardPosition = boardPosition;
+        this.currentHP = 1;
+        this.maxHP = 100;
+        this.hpAnimate = this.maxHP;
+        this.moveY = this.y;
+        this.moveX = this.x;
+        this.score = 0;
+        this.attack = 5;
+        this.t = "Q";
+    }
+    draw() {
+        super.draw();
+        ctx.save();
+        ctx.filter = 'brightness(50%)';
+        ctx.drawImage(queenImg, this.x - 5, this.y - 20);
+        ctx.restore();
+        this.animateMovement()
+        this.animateHP()
+    };
+    findLegalMoves() {
+        let moves = super.findLegalMoves();
+        let diagonals = [-8, -6, 6, 8];
+        diagonals.forEach(f => {
+            let coord = this.boardPosition + f;
+            if (coord >= 0 && coord <= 48 &&
+                this.parsePosition(this.boardPosition + f).x >= this.x - 50 &&
+                this.parsePosition(this.boardPosition + f).x <= this.x + 50) {
+                moves.push(coord)
+            };
+        });
+        return moves;
+    };
+    cursePiece() {
+        let max = -Infinity,
+            strongPiece
+
+        playerPieces.forEach(function (v, k) {
+            if (v.currentHP > 0) {
+                if (max < v.attack) {
+                    max = v.attack;
+                    strongPiece = k;
+                };
+            };
+        });
+        specialUI.push({ t: 'c', l: playerPieces[strongPiece], s: 1, o: 1 })
+        this.animateSpecial()
+    }
+    moveQueen() {
+        if (!playerTurn && moveToo == undefined && !isGameOver()) {
+
+            if ((turn/3) % 5 == 0 && turn > 0) {
+                this.cursePiece();
+            } else if ((turn/2) % 5 == 0 && turn > 0) {
+                this.heal();
+            } else if ((turn % 5) == 0 && turn > 0) {
+                this.buffAttack();
+            } else {
+                let newBoard = [...playerPieces, queenPiece];
+                findBestMove(newBoard, 2, false);
+                moveToo = moveTo;
+                let pI = playerPieces.findIndex(i => i.boardPosition === moveToo);
+                if (pI < 0) {
+                    this.moveX = this.parsePosition(moveToo).x;
+                    this.moveY = this.parsePosition(moveToo).y;
+                    this.boardPosition = moveToo;
+                } else {
+                    this.attackAnimation(playerPieces[pI], this.attack);
+                };
+            };
+        };
+    };
+};
+
+class Pawn extends Piece {
+    constructor(boardPosition, k) {
+        super();
+        this.x = this.parsePosition(boardPosition).x;
+        this.y = this.parsePosition(boardPosition).y;
+        this.currentHP = 1;
+        this.maxHP = 100;
+        this.key = k;
+        this.hpAnimate = this.maxHP;
+        this.selected = 0;
+        this.boardPosition = boardPosition;
+        this.moveY = this.y;
+        this.moveX = this.x;
+        this.attack = this.key == 3 ? 20 : 10;
+        this.t = "P";
+        this.cursed = 0;
+        this.angle = 0;
+        this.dead = 0;
+        this.opacity = 100
+    };
+    draw(x = this.x, y = this.y, w = 40, h = 60, i = 0) {
+        super.draw();
+
+        let deg;
+        this.key == 1 ? deg = 120 : 0;
+        this.key == 2 ? deg = 0 : 0;
+        this.key == 3 ? deg = 180 : 0;
+        ctx.save();
+        
+        if(this.hpAnimate == 0 && !i){
+            this.moveY = this.parsePosition(this.boardPosition).y + 25;
+            this.opacity > 0 ? this.opacity-=10 : this.opacity = 0;
+            this.color = `brightness(50%) hue-rotate(${deg}deg) opacity(${this.opacity}%)`;
+        } else {
+            this.color = `brightness(50%) hue-rotate(${deg}deg)`;
+        };
+        ctx.filter = this.color;
+        ctx.drawImage(pawnImg, x, y, w, h);
+        ctx.restore();
+        this.animateMovement();
+        this.animateHP();
+    };
+    attackPiece() {
+        let canAttack = false;
+        let diagonals = [-8, -6, 6, 8];
+        diagonals.forEach(f => {
+            let coord = this.boardPosition + f;
+            if (coord >= 0 && coord <= 48 &&
+                queenPiece.boardPosition == coord &&
+                this.parsePosition(this.boardPosition + f).x >= this.x - 50 &&
+                this.parsePosition(this.boardPosition + f).x <= this.x + 50) {
+                canAttack = true;
+            };
+        });
+        return canAttack;
+    };
+};
+
 let fired = false;
 canvas.onkeyup = function () { fired = false };
 
