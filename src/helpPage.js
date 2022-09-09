@@ -5,14 +5,14 @@ export function drawHelpPlayer(){
 
     drawBackground();
     drawText("PAWNS", canvas.width / 2, 170, 100, 'black');
-    drawText("PAWNS", canvas.width / 2, 165, 100);
+    drawText("PAWNS", canvas.width / 2, 165, 100, 'white');
     
     drawText("MOVE ON THE STRAIGHTS - ACTION ON THE DIAGONALS", canvas.width / 2, 225, 20, 'yellow');
 
-    drawText("NO ABILITIES - HAS INCREASED ATTACK", canvas.width / 2, 300, 20, 'white');
+    drawText("NO ABILITIES - STARTS WITH 20 ATTACK", canvas.width / 2, 300, 20, 'white');
     
-    drawText("CAN HEAL OTHER PIECES IN RANGE AND", canvas.width / 2, 350, 20, 'white');
-    drawText("REMOVE CURSE FROM PIECES", canvas.width / 2, 365, 20, 'white');
+    drawText("CAN REMOVE CURSES AND HEAL ", canvas.width / 2, 350, 20, 'white');
+    drawText("OTHER PIECES WITHIN A 2 TILE RANGE", canvas.width / 2, 365, 20, 'white');
    
 
     drawText("CAN INCREASE PIECE ATTACK", canvas.width / 2, 430, 20, 'white');
@@ -21,7 +21,7 @@ export function drawHelpPlayer(){
 export function drawHelpEnemy(){
     drawBackground();
     drawText("QUEEN", canvas.width / 2, 170, 100, 'black');
-    drawText("QUEEN", canvas.width / 2, 165, 100);
+    drawText("QUEEN", canvas.width / 2, 165, 100, 'white');
 
     drawText("KILL THE EVIL QUEEN PIECE", canvas.width / 2, 225, 25, 'yellow');
 

@@ -1,23 +1,21 @@
 import { drawHelpPlayer, drawHelpEnemy } from './helpPage.js'
-import { changePauseSelection } from './pauseScreen.js';
+import { changePauseSelection, pauseScreen} from './pauseScreen.js';
 import { drawBoard, boardX, boardY, cellSize } from './boardUI.js';
 import { rads, FLOOR, dir, drawText, drawTextWithShadow } from './helperFunctions.js';
 
 export const ctx = document.getElementById('canvas').getContext("2d");
 export let allPiece;
-export let playerTurn = 1;
+let playerTurn = 1;
 export let moveTo;
 export const PI = Math.PI;
 
 const pawnImg = new Image();
 const queenImg = new Image();
-export let gamePhase = 0;
 const transitionSpeed = 0.06;
+
 let isTransioning = 0;
 let alpha = 0;
 let transitionTo;
-pawnImg.src = 'p.png';
-queenImg.src = 'q.png';
 let selectedOption = 3;
 let fired = false;
 let queenPiece;
@@ -30,7 +28,10 @@ let start;
 let specialUI = [];
 let playSpecial = 0;
 let lock = false;
-let dt = 0;
+let gamePhase = 0;
+
+pawnImg.src = 'p.png';
+queenImg.src = 'q.png';
 step();
 export class Piece {
     constructor() {
@@ -237,7 +238,6 @@ class Queen extends Piece {
         this.animateSpecial()
     }
     moveQueen() {
-        console.log("ok")
         if (!playerTurn && moveToo == undefined && !isGameOver()) {
 
             if ((turn / 3) % 5 == 0 && turn > 0) {
@@ -327,7 +327,6 @@ canvas.addEventListener('keydown', function (e) {
         fired = true;
         if (gamePhase == 0) {
             if (e.key == 'ArrowUp' || e.key == 'ArrowDown') {
-                console.log(2)
                 changeSelection();
             }
             if (e.key == 'z') {
@@ -349,20 +348,21 @@ canvas.addEventListener('keydown', function (e) {
                     availableMoves = [];
                     playerPieces.forEach(z => {
                         z.selected = 0;
-                    })
-                    if (e.key == 1 && playerPieces[e.key - 1].hpAnimate) {
+                    });
+
+                    if (e.key == 1 && playerPieces[e.key - 1].hpAnimate> 0) {
                         playerPieces[e.key - 1].selected = 1;
                         playerPieces[e.key - 1].findLegalMoves().forEach(m => {
                             availableMoves.push(new Moves(m, playerPieces[e.key - 1]));
                         });
                     };
-                    if (e.key == 2 && playerPieces[e.key - 1].hpAnimate) {
+                    if (e.key == 2 && playerPieces[e.key - 1].hpAnimate > 0) {
                         playerPieces[e.key - 1].selected = 1;
                         playerPieces[e.key - 1].findLegalMoves().forEach(m => {
                             availableMoves.push(new Moves(m, playerPieces[e.key - 1]));
                         });
                     };
-                    if (e.key == 3 && playerPieces[e.key - 2].hpAnimate) {
+                    if (e.key == 3 && playerPieces[e.key - 1].hpAnimate > 0) {
                         playerPieces[e.key - 1].selected = 1;
                         playerPieces[e.key - 1].findLegalMoves().forEach(m => {
                             availableMoves.push(new Moves(m, playerPieces[e.key - 1]));
@@ -616,7 +616,7 @@ function findBestMove(MMBoard, depth, maximisingPlayer) {
 
                 let calculateMinValue = findBestMove(MMBoard, depth - 1, true);
                 pL.currentHP = pO.currentHP;
-                if (calculateMinValue < minEvaluation) {
+                if (calculateMinValue <= minEvaluation) {
                     minEvaluation = calculateMinValue;
                     moveTo = m;
                 };
@@ -626,7 +626,7 @@ function findBestMove(MMBoard, depth, maximisingPlayer) {
                 qL.boardPosition = m;
                 let calculateMinValue = findBestMove(MMBoard, depth - 1, true);
                 qL.boardPosition = qO.boardPosition;
-                if (calculateMinValue < minEvaluation) {
+                if (calculateMinValue <= minEvaluation) {
                     minEvaluation = calculateMinValue;
                     moveTo = m;
                 };
