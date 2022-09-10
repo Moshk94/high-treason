@@ -9,8 +9,8 @@ let playerTurn = 1;
 export let moveTo;
 export const PI = Math.PI;
 
-const pawnImg = new Image();
-const queenImg = new Image();
+export const pawnImg = new Image();
+export const queenImg = new Image();
 const transitionSpeed = 0.06;
 
 let isTransioning = 0;
@@ -28,7 +28,7 @@ let start;
 let specialUI = [];
 let playSpecial = 0;
 let lock = false;
-let gamePhase = 0;
+let gamePhase = 2.1;
 
 pawnImg.src = 'p.png';
 queenImg.src = 'q.png';
@@ -239,7 +239,6 @@ class Queen extends Piece {
     }
     moveQueen() {
         if (!playerTurn && moveToo == undefined && !isGameOver()) {
-
             if ((turn / 3) % 5 == 0 && turn > 0) {
                 this.cursePiece();
             } else if ((turn / 2) % 5 == 0 && turn > 0) {
