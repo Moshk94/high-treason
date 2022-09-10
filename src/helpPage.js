@@ -3,7 +3,6 @@ import { ctx, pawnImg } from "./core";
 
 export function drawHelpPlayer(){
     let pieceX = 100
-    drawBackground();
     drawText("PAWNS", canvas.width / 2, 170, 100, 'black');
     drawText("PAWNS", canvas.width / 2, 165, 100, 'white');
 
