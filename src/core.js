@@ -28,7 +28,7 @@ let start;
 let specialUI = [];
 let playSpecial = 0;
 let lock = false;
-let gamePhase = 2.1;
+let gamePhase = 0;
 
 pawnImg.src = 'p.png';
 queenImg.src = 'q.png';
@@ -716,10 +716,6 @@ export function changeSelection(x) {
 
 export function drawTitlePage() {
     const TITLE = 'HIGH TREASON';
-    ctx.beginPath();
-    ctx.fillStyle = '#265b5f';
-    ctx.fillRect(50, 250, canvas.width - 110, 310);
-    ctx.closePath();
     drawTextWithShadow(TITLE, canvas.width / 2, 310, 90);
     if (selectedOption == 3) {
         drawTextWithShadow("PLAY", canvas.width / 2, 405, 70, "yellow");
@@ -730,10 +726,7 @@ export function drawTitlePage() {
     }
 };
 
-
 // Transitions
-
-
 
 export function screenFade() {
     if (isTransioning) {

@@ -8,21 +8,20 @@ export function drawHelpPlayer(){
     drawText("PAWNS", canvas.width / 2, 165, 100, 'white');
 
     ctx.save();
-    ctx.filter = 'brightness(50%) hue-rotate(180deg)';
+    ctx.filter = 'brightness(75%) hue-rotate(180deg)';
     ctx.drawImage(pawnImg, pieceX, 280 - pawnImg.height/2);
     ctx.restore();
     drawText("NO ABILITIES - STARTS WITH 20 ATTACK", canvas.width / 2 + pieceX/3, 280, 20, 'white');
     
     ctx.save();
-    ctx.filter = 'brightness(50%) hue-rotate(120deg)';
+    ctx.filter = 'brightness(75%) hue-rotate(120deg)';
     ctx.drawImage(pawnImg, pieceX, 350 - pawnImg.height/2);
     ctx.restore();
     drawText("CAN REMOVE CURSES AND HEAL OTHER PIECES", canvas.width / 2 + pieceX/2, 345, 20, 'white');
     drawText("WITHIN A 2 TILE RANGE", canvas.width / 2 - 34, 360, 20, 'white');
-
-
+    
     ctx.save();
-    ctx.filter = 'brightness(50%) hue-rotate(0deg)';
+    ctx.filter = 'brightness(75%) hue-rotate(0deg)';
     ctx.drawImage(pawnImg, pieceX, 420 - pawnImg.height/2);
     ctx.restore();
     drawText("CAN INCREASE PIECE ATTACK", canvas.width / 2 - pieceX/5, 420, 20, 'white');
@@ -46,10 +45,3 @@ export function drawHelpEnemy(){
 
     drawText("RESTORES SOME HEALTH", canvas.width / 2, 440, 22, 'white');
 };
-
-function drawBackground(){
-    ctx.beginPath();
-    ctx.fillStyle = '#265b5f';
-    ctx.fillRect(0, 130, canvas.width, 410);
-    ctx.closePath();
-}
