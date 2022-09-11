@@ -1,7 +1,7 @@
 import { drawHelpPlayer, drawHelpEnemy } from './helpPage.js'
 import { changePauseSelection, pauseScreen } from './pauseScreen.js';
 import { drawBoard, boardX, boardY, cellSize } from './boardUI.js';
-import { rads, FLOOR, dir, drawText, drawTextWithShadow } from './helperFunctions.js';
+import { rads, FLOOR, drawText, drawTextWithShadow } from './helperFunctions.js';
 import { changeEndSelection } from './endScreen.js';
 import { endScreen } from './endScreen.js';
 import pawnsrc from './imgs/p.png'
@@ -62,6 +62,29 @@ function parsePosition(n) {
         y: 180 + (40 * (FLOOR(n / 7))),
         x: 130 + (50 * (n % 7))
     };
+};
+
+const dir = {
+    'ArrowUp': {
+        x: 0,
+        y: -speed,
+        p: -7
+    },
+    'ArrowDown': {
+        x: 0,
+        y: speed,
+        p: 7
+    },
+    'ArrowRight': {
+        x: speed,
+        y: 0,
+        p: 1
+    },
+    'ArrowLeft': {
+        x: -speed,
+        y: 0,
+        p: -1
+    },
 };
 
 export class Piece {
@@ -734,7 +757,7 @@ function drawInformationSection() {
 };
 function findBestMove(MMBoard, depth, maximisingPlayer) {
     let qL = MMBoard[MMBoard.findIndex(i => i.t === "Q")]
-    if (depth == 0 || qL.currentHP == 0) {
+    if (depth == 0 || isGameOver()) {
         let sc = 0
         MMBoard.forEach(s => {
 
