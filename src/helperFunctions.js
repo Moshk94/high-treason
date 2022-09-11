@@ -1,4 +1,4 @@
-import { ctx } from "./core";
+import { ctx, speed } from "./core";
 
 export function drawText(text, centerX, centerY, fontsize, color = '#333') {
     ctx.save();
@@ -22,21 +22,21 @@ export const FLOOR = Math.floor;
 export const dir = {
     'ArrowUp': {
         x: 0,
-        y: -40,
+        y: -speed,
         p: -7
     },
     'ArrowDown': {
         x: 0,
-        y: 40,
+        y: speed,
         p: 7
     },
     'ArrowRight': {
-        x: 50,
+        x: speed,
         y: 0,
         p: 1
     },
     'ArrowLeft': {
-        x: -50,
+        x: -speed,
         y: 0,
         p: -1
     },

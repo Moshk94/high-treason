@@ -47,7 +47,7 @@ let lock = false;
 let gamePhase = 0;
 let doneCurse = 0;
 let specialAnimation = 0;
-let speed = 5;
+export let speed = 5;
 pawnImg.src = pawnsrc;
 queenImg.src = queensrc;
 arrowImg.src = arrowsrc;
@@ -80,6 +80,8 @@ export class Piece {
             this.dx = 0;
             this.opacity = 100;
         }
+        this.x += this.dx;
+        this.y += this.dy;
         this.score = this.updateScore();
         if (this.hpAnimate == 0) { this.opacity > 0 ? this.opacity -= 10 : this.opacity = 0 }
         this.score = this.updateScore();
@@ -279,15 +281,12 @@ class Queen extends Piece {
         super();
         this.boardPosition = boardPosition;
         this.maxHP = 100;
-        this.attack = 5;
+        this.attack = 10;
         this.attackPiece = this;
     }
     draw() {
         super.draw();
         ctx.save();
-        // TODO: Can the next two lines be added in the Parent draw function?
-        this.x += this.dx;
-        this.y += this.dy;
         ctx.filter = `sepia(100%) brightness(100%) opacity(${this.opacity}%)`;
         ctx.drawImage(queenImg, this.x - 5, this.y - 20);
         ctx.restore();
@@ -363,7 +362,7 @@ class Pawn extends Piece {
         this.maxHP = 100;
         this.key = k;
         this.selected = 0;
-        this.attack = 200//this.key == 3 ? 20 : 10;
+        this.attack = this.key == 3 ? 20 : 10;
         this.cursed = 0;
     };
     draw(x = this.x, y = this.y, w = 40, h = 60, i = 0) {
@@ -372,12 +371,9 @@ class Pawn extends Piece {
         this.key == 1 ? deg = 120 : 0;
         this.key == 2 ? deg = 0 : 0;
         this.key == 3 ? deg = 180 : 0;
-
         ctx.save();
         ctx.filter = this.color;
         if (!i) {
-            this.x += this.dx;
-            this.y += this.dy;
             this.color = `brightness(75%) hue-rotate(${deg}deg)`;
             ctx.drawImage(pawnImg, this.x, this.y, w, h);
         } else {
