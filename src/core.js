@@ -32,7 +32,7 @@ let alpha = 0;
 let transitionTo;
 let selectedOption = 3;
 let fired = false;
-let queenPiece;
+export let queenPiece;
 let playerPieces = [];
 let time = 0;
 let moveToo;
@@ -483,6 +483,7 @@ function step(timestamp) {
     } else if (gamePhase == 2.2) {
         // Help Page 2
         drawHelpEnemy();
+
     } else if (gamePhase == 3 || gamePhase == -1) {
         drawBoard();
         allPiece = [...availableMoves, ...playerPieces, queenPiece].sort(function (a, b) { return a.y - b.y });
@@ -555,6 +556,7 @@ function step(timestamp) {
                 };
             });
         };
+        if(isGameOver() && gamePhase == 3){changeTransitionTo(-1)};
     };
     screenFade();
 };
@@ -717,7 +719,7 @@ function endMoves() {
     };
 };
 
-function isGameOver(){
+export function isGameOver(){
     let queenHealth = queenPiece.hpAnimate;
     let sumOfAllPlayerHealth = 0;
     playerPieces.forEach(h =>{
@@ -811,11 +813,11 @@ export function screenFade() {
 
     if (gamePhase == -1) {
         if (transitionTo == 0) {
-            pauseScreen();
+            pauseScreen(isGameOver());
             fade(alpha)
         } else {
             fade(alpha);
-            pauseScreen();
+            pauseScreen(isGameOver());
         }
     } else {fade(alpha)}
 };
