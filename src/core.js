@@ -755,77 +755,7 @@ function drawInformationSection() {
     ctx.drawImage(queenImg, boardX - 25, boardY - 130);
     ctx.restore();
 };
-function findBestMove(MMBoard, depth, maximisingPlayer) {
-    let qL = MMBoard[MMBoard.findIndex(i => i.t === "Q")]
-    if (depth == 0 || isGameOver()) {
-        let sc = 0
-        MMBoard.forEach(s => {
-
-            sc += s.updateScore()
-        });
-        return sc;
-    };
-
-    if (!maximisingPlayer) {
-        let minEvaluation = Infinity;
-        let qO = Object.assign(Object.create(Object.getPrototypeOf(qL)), qL);
-        qL.findLegalMoves().forEach(m => {
-            let pL = MMBoard[MMBoard.findIndex(i => i.boardPosition === m)];
-
-
-            if (pL) {
-                let pO = Object.assign(Object.create(Object.getPrototypeOf(pL)), pL);
-                pL.currentHP -= qL.attack
-
-                let calculateMinValue = findBestMove(MMBoard, depth - 1, true);
-                pL.currentHP = pO.currentHP;
-                if (calculateMinValue < minEvaluation) {
-                    minEvaluation = calculateMinValue;
-                    moveTo = m;
-                };
-            }
-
-            if (!pL) {
-                qL.boardPosition = m;
-                let calculateMinValue = findBestMove(MMBoard, depth - 1, true);
-                qL.boardPosition = qO.boardPosition;
-                if (calculateMinValue < minEvaluation) {
-                    minEvaluation = calculateMinValue;
-                    moveTo = m;
-                };
-            }
-        });
-        return minEvaluation;
-    };
-
-    if (maximisingPlayer) {
-        let maxEvaluation = -Infinity;
-        MMBoard.forEach(p => {
-            if (p.t == "P") {
-                if (p.attackPiece()) {
-                    let qO = Object.assign(Object.create(Object.getPrototypeOf(qL)), qL);
-                    qL.currentHP -= p.attack;
-                    let caclulatedMaxValue = findBestMove(MMBoard, depth - 1, false);
-                    qL.currentHP = qO.currentHP;
-                    if (caclulatedMaxValue > maxEvaluation) {
-                        maxEvaluation = caclulatedMaxValue
-                    };
-                };
-
-                p.findLegalMoves().forEach(m => {
-                    let pO = Object.assign(Object.create(Object.getPrototypeOf(p)), p);
-                    p.boardPosition = m;
-                    let caclulatedMaxValue = findBestMove(MMBoard, depth - 1, false);
-                    p.boardPosition = pO.boardPosition;
-                    if (caclulatedMaxValue > maxEvaluation) {
-                        maxEvaluation = caclulatedMaxValue
-                    };
-                })
-            };
-        });
-        return maxEvaluation
-    };
-};
+function findBestMove(MMBoard, depth, maximisingPlayer) {};
 function movePiece(v, c) {
     let s = playerPieces[c];
     let ind = allPiece.findIndex(i => i.boardPosition == s.boardPosition + v.p);
