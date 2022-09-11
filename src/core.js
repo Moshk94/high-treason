@@ -2,6 +2,9 @@ import { drawHelpPlayer, drawHelpEnemy } from './helpPage.js'
 import { changePauseSelection, pauseScreen} from './pauseScreen.js';
 import { drawBoard, boardX, boardY, cellSize } from './boardUI.js';
 import { rads, FLOOR, dir, drawText, drawTextWithShadow } from './helperFunctions.js';
+import pawnsrc from './imgs/p.png'
+import queensrc from './imgs/q.png'
+
 
 export const ctx = document.getElementById('canvas').getContext("2d");
 export let allPiece;
@@ -30,8 +33,8 @@ let playSpecial = 0;
 let lock = false;
 let gamePhase = 0;
 
-pawnImg.src = 'p.png';
-queenImg.src = 'q.png';
+pawnImg.src = pawnsrc;
+queenImg.src = queensrc;
 step();
 export class Piece {
     constructor() {
