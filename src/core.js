@@ -4,7 +4,12 @@ import { drawBoard, boardX, boardY, cellSize } from './boardUI.js';
 import { rads, FLOOR, dir, drawText, drawTextWithShadow } from './helperFunctions.js';
 import pawnsrc from './imgs/p.png'
 import queensrc from './imgs/q.png'
-
+import arrowsrc from './imgs/arrow.png'
+import zsrc from './imgs/z.png'
+import onekeysrc from './imgs/1.png'
+import twokeysrc from './imgs/2.png'
+import threekeysrc from './imgs/3.png'
+import xkeysrc from './imgs/x.png'
 
 export const ctx = document.getElementById('canvas').getContext("2d");
 export let allPiece;
@@ -14,6 +19,12 @@ export const PI = Math.PI;
 
 export const pawnImg = new Image();
 export const queenImg = new Image();
+export const arrowImg = new Image();
+export const zImg = new Image();
+export const onekeyImg = new Image();
+export const twokeyImg = new Image();
+export const threekeyImg = new Image();
+export const xkeyImg = new Image();
 const transitionSpeed = 0.06;
 
 let isTransioning = 0;
@@ -35,6 +46,12 @@ let gamePhase = 0;
 
 pawnImg.src = pawnsrc;
 queenImg.src = queensrc;
+arrowImg.src = arrowsrc;
+zImg.src = zsrc;
+onekeyImg.src = onekeysrc;
+twokeyImg.src = twokeysrc;
+threekeyImg.src = threekeysrc;
+xkeyImg.src = xkeysrc;
 step();
 export class Piece {
     constructor() {
@@ -323,7 +340,17 @@ class Pawn extends Piece {
     };
 };
 canvas.onkeyup = function () { fired = false };
-
+function setupGame(){
+    queenPiece = undefined;
+    playerPieces = [];
+    queenPiece = new Queen(10);
+    playerPieces = [
+        new Pawn(44, 1),
+        new Pawn(38, 2),
+        new Pawn(46, 3)
+    ];
+    playerTurn = 1;
+}
 canvas.addEventListener('keydown', function (e) {
     if (!fired) {
         fired = true;
@@ -331,16 +358,8 @@ canvas.addEventListener('keydown', function (e) {
             if (e.key == 'ArrowUp' || e.key == 'ArrowDown') {
                 changeSelection();
             }
-            if (e.key == 'z') {
-                queenPiece = undefined;
-                playerPieces = [];
-                queenPiece = new Queen(10);
-                playerPieces = [
-                    new Pawn(44, 1),
-                    new Pawn(38, 2),
-                    new Pawn(46, 3)
-                ];
-                playerTurn = 1;
+            if (e.key.toLowerCase() == 'z') {
+                setupGame();
                 changeTransitionTo(changeSelection(1));
             };
         } else if (gamePhase == 3) {
@@ -437,6 +456,14 @@ canvas.addEventListener('keydown', function (e) {
             if (e.key == 'z') {
                 changeTransitionTo(changePauseSelection());
             };
+        } else if (gamePhase == 2.1 || 2.2){
+            if (e.key.toLowerCase() == 'z') {
+                setupGame();
+                changeTransitionTo(changeSelection(1));
+            };
+            
+            gamePhase == 2.1 && e.key == 'ArrowRight' ? changeTransitionTo(2.2):0;
+            gamePhase == 2.2 && e.key == 'ArrowLeft' ? changeTransitionTo(2.1):0;
         };
     }
 });
@@ -719,15 +746,33 @@ export function changeSelection(x) {
 
 export function drawTitlePage() {
     const TITLE = 'HIGH TREASON';
-    drawTextWithShadow(TITLE, canvas.width / 2, 310, 90);
+    drawTextWithShadow(TITLE, canvas.width / 2, 250, 90);
+    let leftButtonX = 200;
+    let leftButtonY = 475;
+    drawImage(arrowImg, leftButtonX,leftButtonY,180);
+    drawImage(arrowImg, leftButtonX+24,leftButtonY);
+    drawTextWithShadow("SELECT", leftButtonX + 25, leftButtonY +35, 25, "white");
+
+
+    drawImage(zImg, leftButtonX + 150,leftButtonY,180);
+    drawTextWithShadow("confirm", leftButtonX + 165, leftButtonY +35, 25, "white");
     if (selectedOption == 3) {
-        drawTextWithShadow("PLAY", canvas.width / 2, 405, 70, "yellow");
-        drawTextWithShadow("HELP", canvas.width / 2, 465, 50, "white");
+        drawTextWithShadow("PLAY", canvas.width / 2, 345, 70, "yellow");
+        drawTextWithShadow("HELP", canvas.width / 2, 405, 50, "white");
     } else {
-        drawTextWithShadow("PLAY", canvas.width / 2, 405, 70, "white");
-        drawTextWithShadow("HELP", canvas.width / 2, 465, 50, "yellow");
+        drawTextWithShadow("PLAY", canvas.width / 2, 345, 70, "white");
+        drawTextWithShadow("HELP", canvas.width / 2, 405, 50, "yellow");
     }
 };
+
+export function drawImage(src,x,y,deg = 0){
+    ctx.save();
+    ctx.translate(x + src.width/2, y + src.width/2);
+    ctx.rotate(rads(deg))
+    ctx.translate(-x- src.width/2, -y - src.width/2);
+    ctx.drawImage(src,x,y)
+    ctx.restore();
+}
 
 // Transitions
 
