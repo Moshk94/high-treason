@@ -176,7 +176,7 @@ export class Piece {
         let healValue;
         if (this.t == "Q") {
             if (this.currentHP == this.maxHP) {
-                this.cursePiece();
+                this.buffAttack();
             } else {
                 healValue = 20;
                 specialUI.push({ t: 'h', v: healValue, l: this, y: this.y });
@@ -655,7 +655,7 @@ function step(timestamp) {
             });
         };
         if (gamePhase == 4) {
-            endScreen(queenPiece.hpAnimate);
+            endScreen(queenPiece.hpAnimate, isTransioning);
         };
     };
     screenFade();
