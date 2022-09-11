@@ -3,6 +3,7 @@ import { changePauseSelection, pauseScreen } from './pauseScreen.js';
 import { drawBoard, boardX, boardY, cellSize } from './boardUI.js';
 import { rads, FLOOR, dir, drawText, drawTextWithShadow } from './helperFunctions.js';
 import { changeEndSelection } from './endScreen.js';
+import { endScreen } from './endScreen.js';
 import pawnsrc from './imgs/p.png'
 import queensrc from './imgs/q.png'
 import arrowsrc from './imgs/arrow.png'
@@ -11,14 +12,9 @@ import onekeysrc from './imgs/1.png'
 import twokeysrc from './imgs/2.png'
 import threekeysrc from './imgs/3.png'
 import xkeysrc from './imgs/x.png'
-import { endScreen } from './endScreen.js';
 
 export const ctx = document.getElementById('canvas').getContext("2d");
-export let allPiece;
-let playerTurn = 1;
-export let moveTo;
 export const PI = Math.PI;
-
 export const pawnImg = new Image();
 export const queenImg = new Image();
 export const arrowImg = new Image();
@@ -27,14 +23,20 @@ export const onekeyImg = new Image();
 export const twokeyImg = new Image();
 export const threekeyImg = new Image();
 export const xkeyImg = new Image();
+
+export let queenPiece;
+export let isTransioning = 0;
+export let allPiece;
+export let moveTo;
+export let speed = 5;
+
 const transitionSpeed = 0.06;
 
-export let isTransioning = 0;
+let playerTurn = 1;
 let alpha = 0;
 let transitionTo;
 let selectedOption = 3;
 let fired = false;
-export let queenPiece;
 let playerPieces = [];
 let time = 0;
 let moveToo;
@@ -42,12 +44,11 @@ let turn = 0;
 let availableMoves = [];
 let start;
 let specialUI = [];
-let playSpecial = 0;
 let lock = false;
 let gamePhase = 0;
 let doneCurse = 0;
 let specialAnimation = 0;
-export let speed = 5;
+
 pawnImg.src = pawnsrc;
 queenImg.src = queensrc;
 arrowImg.src = arrowsrc;
