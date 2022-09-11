@@ -459,7 +459,7 @@ canvas.addEventListener('keydown', function (e) {
         } else if (gamePhase == 2.1 || 2.2){
             if (e.key.toLowerCase() == 'z') {
                 setupGame();
-                changeTransitionTo(changeSelection(1));
+                changeTransitionTo(3);
             };
             
             gamePhase == 2.1 && e.key == 'ArrowRight' ? changeTransitionTo(2.2):0;
