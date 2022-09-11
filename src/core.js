@@ -1,7 +1,8 @@
 import { drawHelpPlayer, drawHelpEnemy } from './helpPage.js'
-import { changePauseSelection, pauseScreen} from './pauseScreen.js';
+import { changePauseSelection, pauseScreen } from './pauseScreen.js';
 import { drawBoard, boardX, boardY, cellSize } from './boardUI.js';
 import { rads, FLOOR, dir, drawText, drawTextWithShadow } from './helperFunctions.js';
+import { changeEndSelection } from './endScreen.js';
 import pawnsrc from './imgs/p.png'
 import queensrc from './imgs/q.png'
 import arrowsrc from './imgs/arrow.png'
@@ -10,6 +11,7 @@ import onekeysrc from './imgs/1.png'
 import twokeysrc from './imgs/2.png'
 import threekeysrc from './imgs/3.png'
 import xkeysrc from './imgs/x.png'
+import { endScreen } from './endScreen.js';
 
 export const ctx = document.getElementById('canvas').getContext("2d");
 export let allPiece;
@@ -27,7 +29,7 @@ export const threekeyImg = new Image();
 export const xkeyImg = new Image();
 const transitionSpeed = 0.06;
 
-let isTransioning = 0;
+export let isTransioning = 0;
 let alpha = 0;
 let transitionTo;
 let selectedOption = 3;
@@ -107,7 +109,7 @@ export class Piece {
         this.currentHP <= 0 ? this.currentHP = 0 : 0;
         this.currentHP >= this.maxHP ? this.currentHP = this.maxHP : 0;
 
-        this.hpAnimate <= 0 ? this.hpAnimate = 0 : 0;
+        this.hpAnimate < 0 ? this.hpAnimate = 0 : 0;
         this.hpAnimate >= this.maxHP ? this.hpAnimate = this.maxHP : 0;
     };
     animateSpecial() {
@@ -211,13 +213,13 @@ class Queen extends Piece {
         this.x = this.parsePosition(boardPosition).x;
         this.y = this.parsePosition(boardPosition).y;
         this.boardPosition = boardPosition;
-        this.currentHP = 1;
+        this.currentHP = 0;
         this.maxHP = 100;
         this.hpAnimate = this.maxHP;
         this.moveY = this.y;
         this.moveX = this.x;
         this.score = 0;
-        this.attack = 5;
+        this.attack = 10;
         this.t = "Q";
     }
     draw() {
@@ -287,7 +289,7 @@ class Pawn extends Piece {
         super();
         this.x = this.parsePosition(boardPosition).x;
         this.y = this.parsePosition(boardPosition).y;
-        this.currentHP = 1;
+        this.currentHP = 0;
         this.maxHP = 100;
         this.key = k;
         this.hpAnimate = this.maxHP;
@@ -340,7 +342,7 @@ class Pawn extends Piece {
     };
 };
 canvas.onkeyup = function () { fired = false };
-function setupGame(){
+function setupGame() {
     queenPiece = undefined;
     playerPieces = [];
     queenPiece = new Queen(10);
@@ -354,7 +356,19 @@ function setupGame(){
 canvas.addEventListener('keydown', function (e) {
     if (!fired) {
         fired = true;
-        if (gamePhase == 0) {
+        if (gamePhase == -1) {
+            if (e.key == 'Escape') {
+                changeTransitionTo(3);
+            } else if (e.key == 'ArrowUp') {
+                changePauseSelection(3);
+            } else if (e.key == 'ArrowDown') {
+                changePauseSelection(0);
+            }
+
+            if (e.key == 'z') {
+                changeTransitionTo(changePauseSelection());
+            };
+        } else if (gamePhase == 0) {
             if (e.key == 'ArrowUp' || e.key == 'ArrowDown') {
                 changeSelection();
             }
@@ -362,6 +376,14 @@ canvas.addEventListener('keydown', function (e) {
                 setupGame();
                 changeTransitionTo(changeSelection(1));
             };
+        } else if (gamePhase == 2.1 || gamePhase == 2.2) {
+            if (e.key.toLowerCase() == 'z') {
+                setupGame();
+                changeTransitionTo(3);
+            };
+
+            gamePhase == 2.1 && e.key == 'ArrowRight' ? changeTransitionTo(2.2) : 0;
+            gamePhase == 2.2 && e.key == 'ArrowLeft' ? changeTransitionTo(2.1) : 0;
         } else if (gamePhase == 3) {
             // INFO: Game key function will go here.
             if (playerTurn) {
@@ -371,7 +393,7 @@ canvas.addEventListener('keydown', function (e) {
                         z.selected = 0;
                     });
 
-                    if (e.key == 1 && playerPieces[e.key - 1].hpAnimate> 0) {
+                    if (e.key == 1 && playerPieces[e.key - 1].hpAnimate > 0) {
                         playerPieces[e.key - 1].selected = 1;
                         playerPieces[e.key - 1].findLegalMoves().forEach(m => {
                             availableMoves.push(new Moves(m, playerPieces[e.key - 1]));
@@ -444,28 +466,18 @@ canvas.addEventListener('keydown', function (e) {
                 changeTransitionTo(-1);
                 changePauseSelection(3);
             }
-        } else if (gamePhase == -1) {
-            if (e.key == 'Escape') {
-                changeTransitionTo(3);
-            } else if (e.key == 'ArrowUp') {
-                changePauseSelection(3);
+        } else if (gamePhase == 4) {
+            if (e.key == 'ArrowUp') {
+                changeEndSelection();
             } else if (e.key == 'ArrowDown') {
-                changePauseSelection(0);
+                changeEndSelection();
             }
-
             if (e.key == 'z') {
-                changeTransitionTo(changePauseSelection());
-            };
-        } else if (gamePhase == 2.1 || 2.2){
-            if (e.key.toLowerCase() == 'z') {
                 setupGame();
-                changeTransitionTo(3);
+                changeTransitionTo(changeEndSelection(1));
             };
-            
-            gamePhase == 2.1 && e.key == 'ArrowRight' ? changeTransitionTo(2.2):0;
-            gamePhase == 2.2 && e.key == 'ArrowLeft' ? changeTransitionTo(2.1):0;
         };
-    }
+    };
 });
 
 function step(timestamp) {
@@ -484,8 +496,9 @@ function step(timestamp) {
         // Help Page 2
         drawHelpEnemy();
 
-    } else if (gamePhase == 3 || gamePhase == -1) {
+    } else if (gamePhase == 3 || gamePhase == -1 || gamePhase == 4) {
         drawBoard();
+        if (isGameOver() && gamePhase == 3) { changeTransitionTo(4) };
         allPiece = [...availableMoves, ...playerPieces, queenPiece].sort(function (a, b) { return a.y - b.y });
         allPiece.forEach(e => { if (e) { e.draw() } });
         if (playerPieces.length > 0 && queenPiece) { drawInformationSection() }
@@ -556,7 +569,9 @@ function step(timestamp) {
                 };
             });
         };
-        if(isGameOver() && gamePhase == 3){changeTransitionTo(-1)};
+        if (gamePhase == 4) {
+            endScreen(queenPiece.hpAnimate);
+        }
     };
     screenFade();
 };
@@ -719,20 +734,19 @@ function endMoves() {
     };
 };
 
-export function isGameOver(){
+export function isGameOver() {
     let queenHealth = queenPiece.hpAnimate;
     let sumOfAllPlayerHealth = 0;
-    playerPieces.forEach(h =>{
-        sumOfAllPlayerHealth+=h.hpAnimate;
+    playerPieces.forEach(h => {
+        sumOfAllPlayerHealth += h.hpAnimate;
     })
 
-    if(queenHealth == 0 || sumOfAllPlayerHealth == 0){
+    if (queenHealth == 0 || sumOfAllPlayerHealth == 0) {
         return true;
     } else {
         return false;
     };
 };
-
 
 export function changeSelection(x) {
     if (x) {
@@ -751,13 +765,13 @@ export function drawTitlePage() {
     drawTextWithShadow(TITLE, canvas.width / 2, 250, 90);
     let leftButtonX = 200;
     let leftButtonY = 475;
-    drawImage(arrowImg, leftButtonX,leftButtonY,180);
-    drawImage(arrowImg, leftButtonX+24,leftButtonY);
-    drawTextWithShadow("SELECT", leftButtonX + 25, leftButtonY +35, 25, "white");
+    drawImage(arrowImg, leftButtonX, leftButtonY, 180);
+    drawImage(arrowImg, leftButtonX + 24, leftButtonY);
+    drawTextWithShadow("SELECT", leftButtonX + 25, leftButtonY + 35, 25, "white");
 
 
-    drawImage(zImg, leftButtonX + 150,leftButtonY,180);
-    drawTextWithShadow("confirm", leftButtonX + 165, leftButtonY +35, 25, "white");
+    drawImage(zImg, leftButtonX + 150, leftButtonY, 180);
+    drawTextWithShadow("confirm", leftButtonX + 165, leftButtonY + 35, 25, "white");
     if (selectedOption == 3) {
         drawTextWithShadow("PLAY", canvas.width / 2, 345, 70, "yellow");
         drawTextWithShadow("HELP", canvas.width / 2, 405, 50, "white");
@@ -767,12 +781,12 @@ export function drawTitlePage() {
     }
 };
 
-export function drawImage(src,x,y,deg = 0){
+export function drawImage(src, x, y, deg = 0) {
     ctx.save();
-    ctx.translate(x + src.width/2, y + src.width/2);
+    ctx.translate(x + src.width / 2, y + src.width / 2);
     ctx.rotate(rads(deg))
-    ctx.translate(-x- src.width/2, -y - src.width/2);
-    ctx.drawImage(src,x,y)
+    ctx.translate(-x - src.width / 2, -y - src.width / 2);
+    ctx.drawImage(src, x, y)
     ctx.restore();
 }
 
@@ -780,7 +794,7 @@ export function drawImage(src,x,y,deg = 0){
 
 export function screenFade() {
     if (isTransioning) {
-        if (gamePhase == 3 && transitionTo == -1) {
+        if ((gamePhase == 3 && transitionTo == -1) || transitionTo == 4) {
             if (alpha < 0.8) {
                 alpha += transitionSpeed;
             } else {
@@ -803,7 +817,7 @@ export function screenFade() {
             };
         }
     } if (!isTransioning) {
-        if (gamePhase != -1) {
+        if (gamePhase != -1 || gamePhase == 4) {
             if (alpha >= 0) {
                 alpha -= (0.06);
                 transitionTo = undefined;
@@ -813,13 +827,13 @@ export function screenFade() {
 
     if (gamePhase == -1) {
         if (transitionTo == 0) {
-            pauseScreen(isGameOver());
+            pauseScreen();
             fade(alpha)
         } else {
             fade(alpha);
-            pauseScreen(isGameOver());
+            pauseScreen();
         }
-    } else {fade(alpha)}
+    } else { fade(alpha) }
 };
 
 export function changeTransitionTo(x) {
