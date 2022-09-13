@@ -356,7 +356,6 @@ class Queen extends Piece {
                 isEvaluating = 1;
                 moveTo = findMove(this.findLegalMoves());
                 isEvaluating = 0;
-                console.log(moveTo)
                 let pI = playerPieces.findIndex(i => i.boardPosition === moveTo);
                 if (pI < 0 || playerPieces[pI].hpAnimate == 0) {
                     this.direction = moveTo;
@@ -764,7 +763,7 @@ function drawInformationSection() {
 function findMove(x) {
     let bestMove;
     let score = 0
-    let bestScore = 600;
+    let bestScore = Infinity;
     shuffle(x)
     x.forEach(m => {
         let pI = playerPieces[playerPieces.findIndex(i => i.boardPosition === m)];
@@ -789,7 +788,6 @@ function findMove(x) {
                 score += p.getScore();
             })
             queenPiece.direction = queenPiece.boardPosition = parseInt(oP)
-            console.log(score)
             if (score < bestScore && queenMoveHistory.indexOf(m) == -1) {
                 bestScore = score;
                 bestMove = m;
