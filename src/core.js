@@ -42,13 +42,14 @@ let time = 0;
 let moveToo;
 let turn = 0;
 let availableMoves = [];
+let queenMoveHistory = [];
 let start;
 let specialUI = [];
 let lock = false;
 let gamePhase = 0;
 let doneCurse = 0;
 let specialAnimation = 0;
-
+let isEvaluating = 0;
 pawnImg.src = pawnsrc;
 queenImg.src = queensrc;
 arrowImg.src = arrowsrc;
@@ -63,7 +64,9 @@ function parsePosition(n) {
         x: 130 + (50 * (n % 7))
     };
 };
-
+function shuffle(array) {
+    return array.sort(() => Math.random() - 0.5);
+}
 const dir = {
     'ArrowUp': {
         x: 0,
@@ -97,7 +100,6 @@ export class Piece {
             this.y = parsePosition(this.boardPosition).y;
             this.currentHP = 0;
             this.hpAnimate = this.maxHP;
-            this.score = 0;
             this.t = this.constructor.name.substring(0, 1);
             this.direction = this.boardPosition;
             this.dy = 0;
@@ -106,9 +108,7 @@ export class Piece {
         }
         this.x += this.dx;
         this.y += this.dy;
-        this.score = this.updateScore();
         if (this.hpAnimate == 0) { this.opacity > 0 ? this.opacity -= 10 : this.opacity = 0 }
-        this.score = this.updateScore();
         this.movePieceTo();
         this.attackAnimation();
         this.animateSpecial();
@@ -135,10 +135,10 @@ export class Piece {
             };
         };
     };
-    updateScore() {
+    getScore() {
         let preCalc = this.t == "P" ? 1 : -1;
-        let modifier = this.currentHP > 0 ? preCalc : 0;
-        return (this.currentHP + (this.attack / 0.1)) * modifier;
+        let modifier = this.hpAnimate > 0 ? preCalc : 0;
+        return (this.hpAnimate + (this.attack / 0.1)) * modifier;
     };
     animateHP() {
         this.hpAnimate < this.currentHP ? this.currentHP -= 2 : 0;
@@ -305,7 +305,7 @@ class Queen extends Piece {
         super();
         this.boardPosition = boardPosition;
         this.maxHP = 100;
-        this.attack = 10;
+        this.attack = 30;
         this.attackPiece = this;
     }
     draw() {
@@ -353,14 +353,19 @@ class Queen extends Piece {
             } else if ((turn % 5) == 0 && turn > 0) {
                 this.buffAttack();
             } else {
-                let newBoard = [...playerPieces, queenPiece];
-                findBestMove(newBoard, 2, false);
-
-                moveToo = moveTo;
-
-                let pI = playerPieces.findIndex(i => i.boardPosition === moveToo);
-                if (pI < 0) {
-                    this.direction = moveToo;
+                isEvaluating = 1;
+                moveTo = findMove(this.findLegalMoves());
+                isEvaluating = 0;
+                console.log(moveTo)
+                let pI = playerPieces.findIndex(i => i.boardPosition === moveTo);
+                if (pI < 0 || playerPieces[pI].hpAnimate == 0) {
+                    this.direction = moveTo;
+                    if (queenMoveHistory.length == 2) {
+                        queenMoveHistory.splice(1);
+                        queenMoveHistory.unshift(moveTo);
+                    } else {
+                        queenMoveHistory.unshift(moveTo);
+                    }
                 } else {
                     this.attackingX = 1;
                     this.attackingY = 1;
@@ -755,7 +760,47 @@ function drawInformationSection() {
     ctx.drawImage(queenImg, boardX - 25, boardY - 130);
     ctx.restore();
 };
-function findBestMove(MMBoard, depth, maximisingPlayer) {};
+
+function findMove(x) {
+    let bestMove;
+    let score = 0
+    let bestScore = 600;
+    shuffle(x)
+    x.forEach(m => {
+        let pI = playerPieces[playerPieces.findIndex(i => i.boardPosition === m)];
+        if (pI) {
+            pI.hpAnimate -= queenPiece.attack;
+            score += queenPiece.getScore();
+            playerPieces.forEach(p => {
+                score += p.getScore();
+            })
+
+            if (score < bestScore) {
+                bestScore = score;
+                bestMove = m;
+            }
+            
+            pI.hpAnimate += queenPiece.attack;
+        } else {
+            let oP = queenPiece.boardPosition.toString();
+            queenPiece.direction = queenPiece.boardPosition = m;
+            score += queenPiece.getScore();
+            playerPieces.forEach(p => {
+                score += p.getScore();
+            })
+            queenPiece.direction = queenPiece.boardPosition = parseInt(oP)
+            console.log(score)
+            if (score < bestScore && queenMoveHistory.indexOf(m) == -1) {
+                bestScore = score;
+                bestMove = m;
+            }
+        };
+        score = 0;
+    })
+
+    return bestMove
+}
+
 function movePiece(v, c) {
     let s = playerPieces[c];
     let ind = allPiece.findIndex(i => i.boardPosition == s.boardPosition + v.p);
@@ -792,7 +837,7 @@ export function isGameOver() {
         sumOfAllPlayerHealth += h.hpAnimate;
     })
 
-    if (queenHealth == 0 || sumOfAllPlayerHealth == 0) {
+    if (!isEvaluating && (queenHealth == 0 || sumOfAllPlayerHealth == 0)) {
         return true;
     } else {
         return false;
